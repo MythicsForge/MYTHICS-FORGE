@@ -1,0 +1,6 @@
+{
+  "name": "Mythics Forge",
+  "description": "The legendary immersive portfolio of Mythics Forge, showcasing interactive digital worlds, 3D games, and creative code. Features a dynamic project vault, a secure creator's console, and an interactive AI Vance companion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
