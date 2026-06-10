@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Outer glowing background effect -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF5E13" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient background glow (optional but highly premium) -->
+  <circle cx="50" cy="50" r="48" fill="url(#glow)" />
+
+  <!-- Outer Diamond (Square Rotated 45 degrees) -->
+  <polygon points="50,4 96,50 50,96 4,50" stroke="#f4f4f5" stroke-width="1.5" fill="none" stroke-linejoin="round" opacity="0.9" />
+
+  <!-- Second Concentric Diamond -->
+  <polygon points="50,12 88,50 50,88 12,50" stroke="#f4f4f5" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.6" />
+
+  <!-- Inner Concentric Diamond -->
+  <polygon points="50,20 80,50 50,80 20,50" stroke="#f4f4f5" stroke-width="0.75" fill="none" stroke-linejoin="round" opacity="0.4" />
+
+  <!-- Main Horizontal Equator Line -->
+  <line x1="4" y1="50" x2="96" y2="50" stroke="#f4f4f5" stroke-width="1" opacity="0.6" />
+
+  <!-- Primary Inverted Triangle (Base slightly raised to intersect diamonds elegantly) -->
+  <polygon points="18,36 82,36 50,78" stroke="#f4f4f5" stroke-width="1.25" fill="none" stroke-linejoin="round" opacity="0.85" />
+
+  <!-- Small Upright Triangle pointing to the top apex -->
+  <polygon points="32,50 68,50 50,12" stroke="#f4f4f5" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.7" />
+
+  <!-- Center Dotted/Dashed Vertical Axis of Symmetry -->
+  <line x1="50" y1="4" x2="50" y2="96" stroke="#f4f4f5" stroke-width="1" stroke-dasharray="2,2" opacity="0.5" />
+</svg>

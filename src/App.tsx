@@ -13,7 +13,7 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   tagline: "We Build Future",
   description: "An elite, independent digital craft studio operated by a solo developer. Designing low-latency system-level tools, high-fidelity WebGL graphics pipelines, and resilient full-stack architectures.",
   logoText: "MF",
-  logoImageUrl: "",
+  logoImageUrl: "/src/assets/images/logo.svg",
   logoAlignment: "center",
   logoObjectPosition: "center",
   logoScale: "medium"
@@ -23,11 +23,30 @@ export default function App() {
   const [projects, setProjects] = useState<Project[]>(() => {
     try {
       if (INITIAL_PROJECTS.length === 0) {
-        localStorage.removeItem("mythics_forge_projects");
+        localStorage.removeItem("mythics_forge_projects_v2");
         return [];
       }
-      const saved = localStorage.getItem("mythics_forge_projects");
-      return saved ? JSON.parse(saved) : INITIAL_PROJECTS;
+      const saved = localStorage.getItem("mythics_forge_projects_v2");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Project[];
+        // Filter out any projects that are no longer in our base code definition
+        const filtered = parsed.filter(p => INITIAL_PROJECTS.some(ip => ip.id === p.id));
+        
+        // Auto-seed or update attributes (such as newly updated image paths and creator role)
+        INITIAL_PROJECTS.forEach((initProj) => {
+          const existingIdx = filtered.findIndex(p => p.id === initProj.id);
+          if (existingIdx === -1) {
+            filtered.push(initProj);
+          } else {
+            // Keep user customized text but sync visual attributes and updated roles from data definition
+            filtered[existingIdx].bannerImage = initProj.bannerImage;
+            filtered[existingIdx].image = initProj.image;
+            filtered[existingIdx].role = initProj.role;
+          }
+        });
+        return filtered;
+      }
+      return INITIAL_PROJECTS;
     } catch {
       return INITIAL_PROJECTS;
     }
@@ -40,7 +59,22 @@ export default function App() {
         return [];
       }
       const saved = localStorage.getItem("mythics_forge_chronicles");
-      return saved ? JSON.parse(saved) : INITIAL_CHRONICLES;
+      if (saved) {
+        const parsed = JSON.parse(saved) as ChroniclePost[];
+        // Filter out deleted posts present in local storage
+        const filtered = parsed.filter(c => INITIAL_CHRONICLES.some(ic => ic.id === c.id));
+        
+        INITIAL_CHRONICLES.forEach((initChron) => {
+          const existingIdx = filtered.findIndex(c => c.id === initChron.id);
+          if (existingIdx === -1) {
+            filtered.push(initChron);
+          } else {
+            filtered[existingIdx].image = initChron.image;
+          }
+        });
+        return filtered;
+      }
+      return INITIAL_CHRONICLES;
     } catch {
       return INITIAL_CHRONICLES;
     }
@@ -49,16 +83,57 @@ export default function App() {
   const [studioSettings, setStudioSettings] = useState<StudioSettings>(() => {
     try {
       const saved = localStorage.getItem("mythics_forge_studio_settings");
-      return saved ? JSON.parse(saved) : DEFAULT_STUDIO_SETTINGS;
+      if (saved) {
+        const parsed = JSON.parse(saved) as StudioSettings;
+        if (!parsed.logoImageUrl || parsed.logoImageUrl === "") {
+          parsed.logoImageUrl = "/src/assets/images/logo.svg";
+        }
+        return parsed;
+      }
+      return DEFAULT_STUDIO_SETTINGS;
     } catch {
       return DEFAULT_STUDIO_SETTINGS;
     }
   });
 
-  // Persist files to localStorage when edited
+  const [hasLoadedFromServer, setHasLoadedFromServer] = useState(false);
+
+  // Load unified system state from persistent server file on startup
+  useEffect(() => {
+    fetch("/api/state")
+      .then((res) => {
+        if (!res.ok) throw new Error("Could not reach server state matrix.");
+        return res.json();
+      })
+      .then((serverState) => {
+        if (serverState) {
+          if (Array.isArray(serverState.projects) && serverState.projects.length > 0) {
+            setProjects(serverState.projects);
+          }
+          if (Array.isArray(serverState.chronicles) && serverState.chronicles.length > 0) {
+            setChronicles(serverState.chronicles);
+          }
+          if (serverState.studioSettings) {
+            const loadedSettings = { ...serverState.studioSettings };
+            // Fallback if logo URL empty on server
+            if (!loadedSettings.logoImageUrl || loadedSettings.logoImageUrl === "") {
+              loadedSettings.logoImageUrl = "/src/assets/images/logo.svg";
+            }
+            setStudioSettings(loadedSettings);
+          }
+        }
+        setHasLoadedFromServer(true);
+      })
+      .catch((err) => {
+        console.warn("Could not synchronize server state, staying on local telemetry cache:", err);
+        setHasLoadedFromServer(true); // Allow local modifications to still try syncing later
+      });
+  }, []);
+
+  // Persist files locally when edited (Client fallback caching)
   useEffect(() => {
     try {
-      localStorage.setItem("mythics_forge_projects", JSON.stringify(projects));
+      localStorage.setItem("mythics_forge_projects_v2", JSON.stringify(projects));
     } catch (e) {
       console.error("Failed to write to local ledger store:", e);
     }
@@ -80,13 +155,39 @@ export default function App() {
     }
   }, [studioSettings]);
 
+  // Sync state globally to the server (saves logo and projects permanently for all sessions/devices)
+  useEffect(() => {
+    if (!hasLoadedFromServer) return;
+
+    // Debounce updates slightly to batch rapid user settings changes
+    const timer = setTimeout(() => {
+      fetch("/api/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projects, chronicles, studioSettings })
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Network response not OK");
+          return res.json();
+        })
+        .then((data) => {
+          console.log("🔥 Server ledger sync status:", data.message);
+        })
+        .catch((err) => {
+          console.error("⛔ Failed to synchronize global configuration with server:", err);
+        });
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [projects, chronicles, studioSettings, hasLoadedFromServer]);
+
   // Reset helper to wipe overrides and stoke database back to defaults
   const handleResetData = () => {
     if (confirm("Metamorphic event: Meltdown active records and restore original seed files?")) {
       setProjects(INITIAL_PROJECTS);
       setChronicles(INITIAL_CHRONICLES);
       setStudioSettings(DEFAULT_STUDIO_SETTINGS);
-      localStorage.removeItem("mythics_forge_projects");
+      localStorage.removeItem("mythics_forge_projects_v2");
       localStorage.removeItem("mythics_forge_chronicles");
       localStorage.removeItem("mythics_forge_studio_settings");
     }

@@ -1,39 +1,38 @@
 {
   "projects": [
     {
-      "id": "fluid-dynamics-webgl",
-      "title": "Quantum Fluid Solvers in WebGL",
-      "description": "A high-performance real-time smoothed-particle hydrodynamics solver running on parallel GPU shaders via WebGL. Rendered at fluid sub-6ms frame targets with immersive particle physics pipelines.",
-      "category": "Graphics Engines",
-      "techStack": ["WebGL 2.0", "GLSL Shaders", "TypeScript", "MatrixMath"],
-      "demoUrl": "#",
-      "githubUrl": "#",
-      "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800",
-      "featured": true,
-      "releaseDate": "2026-03-12"
-    },
-    {
-      "id": "low-latency-grpc",
-      "title": "Orion: High-Throughput Event Broker",
-      "description": "An ultra-low-latency event streaming broker written in clean system-level Rust and TypeScript, supporting up to 4 million transactional messages per second with minimal memory allocations.",
-      "category": "System Engineering",
-      "techStack": ["Rust", "gRPC", "WebSockets", "NodeJS"],
-      "demoUrl": "#",
-      "githubUrl": "#",
-      "imageUrl": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800",
-      "featured": true,
-      "releaseDate": "2026-05-24"
+      "id": "mythics-shield",
+      "title": "Mythics Shield",
+      "subtitle": "Real-Time Synthesized Network Scanner",
+      "category": "Creative Code",
+      "summary": "An immersive packet-level network scanner featuring real-time diagnostic grids, parallel system threat mapping, and automated active port analysis.",
+      "description": "### System Architecture & Logic\n\n**Mythics Shield** compiles down to a lightweight standalone network analysis tool. It utilizes a custom raw-socket polling loop, visualizes active network nodes through high-framerate dynamic rendering, and applies a heuristic signature engine to analyze ongoing packet traffic.\n\n### Key Technical Strengths:\n\n* **Synchronous Thread Solvers**: Spawns concurrent network probes designed with zero socket allocation leakage.\n* **Threat Mapping**: Real-time identification of standard ports (SSH, HTTP, database tunnels) mapping malicious signatures against the forge's security matrices.\n* **Sci-Fi Diagnostics Console**: An exquisite, visual-rich web control panel rendering socket flows down to sub-millisecond updates.",
+      "image": "/src/assets/images/regenerated_image_1781023425937.png",
+      "bannerImage": "/src/assets/images/regenerated_image_1781023425937.png",
+      "tags": ["Network Scanner", "Raw Sockets", "Packet Inspection", "Cyber Security", "Rust Engine"],
+      "role": "Lead Architect & Systems Engineer",
+      "client": "Internal R&D / Open-source security community",
+      "timeline": "May 2026 - Present",
+      "githubUrl": "https://github.com/mythicsforge/mythics-shield",
+      "liveUrl": "#",
+      "isFeatured": true,
+      "stats": [
+        { "label": "Analysis Rate", "value": "1.2M pps" },
+        { "label": "Threat Catch Rate", "value": "99.8%" },
+        { "label": "Console Latency", value: "<0.5ms" }
+      ]
     }
   ],
   "chronicles": [
     {
-      "id": "post-1",
-      "title": "Stoking the Shading Furnaces",
-      "excerpt": "Compiling parallel computational grids on GPU kernels and achieving optimal particle interaction buffers.",
-      "content": "Today's engineering sprint culminated in compiling parallel computational grids on GPU kernels. By tuning cache-locality in our fluid particles' spatial grid, we reduced coordinate lookups by 34%, ensuring deep fluid pipelines execute under the sub-6ms mark. Performance metrics are now pristine and fully stabilized.",
-      "category": "Graphics",
-      "date": "2026-06-08",
-      "readTime": "3 min read"
+      "id": "post-2",
+      "title": "Compiling the Mythics Shield raw-socket loop",
+      "summary": "Achieving zero socket allocation leakage in a highly concurrent raw packet inspect daemon.",
+      "content": "We've successfully verified the raw socket event listener loop in Mythics Shield. By binding natively to low-level Linux packet rings and loading custom packet filters directly, we bypassed substantial kernel-to-userland context switches, reaching flawless 1.2M pps packet inspection under maximum system saturation.",
+      "category": "Security",
+      "date": "2026-06-09",
+      "readTime": "4 min read",
+      "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
     }
   ],
   "studioSettings": {

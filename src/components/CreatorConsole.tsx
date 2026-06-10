@@ -321,16 +321,16 @@ export default function CreatorConsole({
   };
 
   return (
-    <section className="bg-white/5 border border-white/10 p-6 rounded-2xl mt-12 max-w-7xl mx-auto overflow-hidden">
+    <section className="bg-white/[0.02] border border-white/[0.08] p-6 rounded-[2rem] mt-12 max-w-7xl mx-auto overflow-hidden shadow-[0_24px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
       {/* Console bar banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-4 mb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-white/[0.06] pb-4 mb-6 gap-4">
         <div className="flex items-center gap-3">
-          <Terminal className="w-5 h-5 text-[#FF5E13]" />
+          <Terminal className="w-5 h-5 text-[#EC4899]" />
           <div>
-            <h3 className="font-sans text-white font-extrabold text-base leading-tight uppercase tracking-wider">
+            <h3 className="font-serif text-white font-extrabold text-base leading-tight uppercase tracking-wider">
               CREATOR_VAULT_CONSOLE
             </h3>
-            <p className="text-[9px] text-[#FF5E13] font-mono tracking-widest mt-0.5">
+            <p className="text-[9px] text-[#EC4899] font-mono tracking-widest mt-0.5">
               SECURE DEPLOYMENT TERMINAL
             </p>
           </div>
@@ -343,15 +343,15 @@ export default function CreatorConsole({
               <button
                 onClick={handleExportData}
                 id="export-ledger-btn"
-                className="px-3 py-1.5 bg-gradient-to-r from-[#FF5E13]/20 to-[#FF2E00]/20 hover:from-[#FF5E13]/30 hover:to-[#FF2E00]/30 border border-[#FF5E13]/30 hover:border-[#FF5E13]/55 text-slate-200 text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-3 py-1.5 bg-gradient-to-r from-[#4F46E5]/20 to-[#EC4899]/20 hover:from-[#4F46E5]/30 hover:to-[#EC4899]/30 border border-[#4F46E5]/30 hover:border-[#4F46E5]/55 text-slate-200 text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors"
                 title="Download unified .app state package containing all settings, projects, and logs"
               >
-                <Download className="w-3.5 h-3.5 text-[#FF5E13]" />
+                <Download className="w-3.5 h-3.5 text-[#EC4899]" />
                 Export .app Container
               </button>
 
-              <label className="px-3 py-1.5 bg-gradient-to-r from-[#FF5E13]/20 to-[#FF2E00]/20 hover:from-[#FF5E13]/30 hover:to-[#FF2E00]/30 border border-[#FF5E13]/30 hover:border-[#FF5E13]/55 text-slate-200 text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors">
-                <Upload className="w-3.5 h-3.5 text-[#FF5E13]" />
+              <label className="px-3 py-1.5 bg-gradient-to-r from-[#4F46E5]/20 to-[#EC4899]/20 hover:from-[#4F46E5]/30 hover:to-[#EC4899]/30 border border-[#EC4899]/30 hover:border-[#EC4899]/55 text-slate-200 text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors">
+                <Upload className="w-3.5 h-3.5 text-[#EC4899]" />
                 Mount .app Container
                 <input 
                   type="file" 
@@ -364,7 +364,7 @@ export default function CreatorConsole({
               <button
                 onClick={onReset}
                 id="reset-forge-btn"
-                className="px-3 py-1.5 bg-white/5 hover:bg-[#FF5E13]/10 border border-white/10 hover:border-[#FF5E13]/30 text-[#FF5E13] text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-3 py-1.5 bg-white/5 hover:bg-[#EC4899]/10 border border-white/10 hover:border-[#EC4899]/30 text-[#EC4899] text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors"
                 title="Melt database back to original defaults"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -407,13 +407,13 @@ export default function CreatorConsole({
 
       {/* LOCK / PASSPORT SCREEN */}
       {!isUnlocked ? (
-        <div className="max-w-md mx-auto py-12 px-6 bg-black/45 border border-white/10 rounded-2xl text-center space-y-6">
-          <div className="w-12 h-12 bg-[#FF5E13]/10 border border-[#FF5E13]/30 text-[#FF5E13] rounded-full flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(255,94,19,0.15)]">
+        <div className="max-w-md mx-auto py-12 px-6 bg-black/45 border border-white/10 rounded-[2rem] text-center space-y-6">
+          <div className="w-12 h-12 bg-[#EC4899]/10 border border-[#EC4899]/30 text-[#EC4899] rounded-full flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(236,72,153,0.15)]">
             <Key className="w-5 h-5" />
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-sans font-black text-white text-base uppercase tracking-wider">
+            <h4 className="font-serif font-black text-white text-base uppercase tracking-wider">
               AUTHORIZE STATION ACCESS
             </h4>
             <p className="text-xs text-white/50 max-w-xs mx-auto leading-relaxed font-sans font-light">
@@ -428,7 +428,7 @@ export default function CreatorConsole({
                 placeholder="Cryptic Passphrase..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-center text-slate-200 outline-none"
+                className="w-full bg-[#030303] border border-white/10 focus:border-[#4F46E5]/50 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-center text-slate-200 outline-none"
               />
               <button
                 type="button"
@@ -442,13 +442,13 @@ export default function CreatorConsole({
             <button
               type="submit"
               id="confirm-unlock-btn"
-              className="w-full py-2.5 bg-[#FF5E13] hover:bg-[#FF4500] text-white font-extrabold text-xs rounded-xl transition-all uppercase tracking-widest cursor-pointer shadow-[0_0_15px_rgba(255,94,19,0.2)]"
+              className="w-full py-2.5 bg-gradient-to-r from-[#4F46E5] to-[#EC4899] hover:from-[#EC4899] hover:to-[#4F46E5] text-white font-extrabold text-xs rounded-xl transition-all uppercase tracking-widest cursor-pointer shadow-[0_4px_20px_rgba(79,70,229,0.35)]"
             >
               Verify Core Encryption
             </button>
           </form>
 
-          <p className="text-[10px] text-[#FF5E13] font-mono tracking-widest bg-[#FF5E13]/5 border border-[#FF5E13]/10 px-3 py-1.5 rounded-lg inline-block">
+          <p className="text-[10px] text-[#EC4899] font-mono tracking-widest bg-[#EC4899]/5 border border-[#EC4899]/10 px-3 py-1.5 rounded-lg inline-block">
             STATION GLYPH CLUE: <span className="text-white hover:underline select-all cursor-copy">forge</span>
           </p>
         </div>
@@ -457,12 +457,12 @@ export default function CreatorConsole({
         <div className="space-y-8">
           {/* STUDIO / COMPANY PROFILE CUSTOMIZER CARD */}
           {!editingProjectId && !isAddingNew && (
-            <div className="bg-white/5 border border-[#FF5E13]/20 hover:border-[#FF5E13]/40 p-5 rounded-2xl grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
+            <div className="bg-white/[0.02] border border-[#EC4899]/20 hover:border-[#EC4899]/40 p-5 rounded-[2rem] grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
               <div className="lg:col-span-1 space-y-3">
-                <span className="text-[9px] bg-[#FF5E13]/10 border border-[#FF5E13]/20 text-[#FF5E13] font-mono px-2.5 py-1 rounded-md uppercase tracking-offset font-black inline-block">
+                <span className="text-[9px] bg-[#EC4899]/10 border border-[#EC4899]/20 text-[#EC4899] font-mono px-2.5 py-1 rounded-md uppercase tracking-offset font-black inline-block">
                   Studio Customization Center
                 </span>
-                <h4 className="font-sans text-white font-extrabold text-base uppercase tracking-wider">
+                <h4 className="font-serif text-white font-extrabold text-base uppercase tracking-wider">
                   Company Identity
                 </h4>
                 <p className="text-xs text-white/50 leading-relaxed font-sans font-light">
@@ -471,7 +471,7 @@ export default function CreatorConsole({
                 
                 {/* Information about what Creator Console is */}
                 <div className="p-3.5 bg-black/45 border border-white/5 rounded-xl text-[11px] text-white/50 space-y-1.5 font-sans leading-relaxed">
-                  <div className="text-[#FF5E13] font-mono text-[9px] uppercase tracking-wider font-bold">🛠️ WHAT IS THE CREATOR CONSOLE?</div>
+                  <div className="text-[#EC4899] font-mono text-[9px] uppercase tracking-wider font-bold">🛠️ WHAT IS THE CREATOR CONSOLE?</div>
                   <p>
                     The <strong>Creator Console</strong> is a secure dynamic management terminal. It empowers you to:
                   </p>
