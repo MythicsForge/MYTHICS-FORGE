@@ -7,13 +7,17 @@ import { useState, useEffect } from "react";
 import { Project, ChroniclePost, StudioSettings } from "./types";
 import { INITIAL_PROJECTS, INITIAL_CHRONICLES } from "./data";
 import ForgePortal from "./components/ForgePortal";
+// @ts-ignore
+import shieldImage from "./assets/images/regenerated_image_1781023425937.png";
+// @ts-ignore
+import logoSvg from "./assets/images/logo.svg";
 
 const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   title: "MYTHICS FORGE",
   tagline: "We Build Future",
   description: "An elite, independent digital craft studio operated by a solo developer. Designing low-latency system-level tools, high-fidelity WebGL graphics pipelines, and resilient full-stack architectures.",
   logoText: "MF",
-  logoImageUrl: "/src/assets/images/logo.svg",
+  logoImageUrl: logoSvg,
   logoAlignment: "center",
   logoObjectPosition: "center",
   logoScale: "medium"
@@ -85,9 +89,7 @@ export default function App() {
       const saved = localStorage.getItem("mythics_forge_studio_settings");
       if (saved) {
         const parsed = JSON.parse(saved) as StudioSettings;
-        if (!parsed.logoImageUrl || parsed.logoImageUrl === "") {
-          parsed.logoImageUrl = "/src/assets/images/logo.svg";
-        }
+        parsed.logoImageUrl = logoSvg;
         return parsed;
       }
       return DEFAULT_STUDIO_SETTINGS;
@@ -108,17 +110,25 @@ export default function App() {
       .then((serverState) => {
         if (serverState) {
           if (Array.isArray(serverState.projects) && serverState.projects.length > 0) {
-            setProjects(serverState.projects);
+            const sanitized = serverState.projects.map((proj: Project) => {
+              const matched = INITIAL_PROJECTS.find(p => p.id === proj.id);
+              if (matched) {
+                return {
+                  ...proj,
+                  image: matched.image,
+                  bannerImage: matched.bannerImage,
+                };
+              }
+              return proj;
+            });
+            setProjects(sanitized);
           }
           if (Array.isArray(serverState.chronicles) && serverState.chronicles.length > 0) {
             setChronicles(serverState.chronicles);
           }
           if (serverState.studioSettings) {
             const loadedSettings = { ...serverState.studioSettings };
-            // Fallback if logo URL empty on server
-            if (!loadedSettings.logoImageUrl || loadedSettings.logoImageUrl === "") {
-              loadedSettings.logoImageUrl = "/src/assets/images/logo.svg";
-            }
+            loadedSettings.logoImageUrl = logoSvg;
             setStudioSettings(loadedSettings);
           }
         }

@@ -9,17 +9,28 @@
       "description": "### System Architecture & Logic\n\n**Mythics Shield** compiles down to a lightweight standalone network analysis tool. It utilizes a custom raw-socket polling loop, visualizes active network nodes through high-framerate dynamic rendering, and applies a heuristic signature engine to analyze ongoing packet traffic.\n\n### Key Technical Strengths:\n\n* **Synchronous Thread Solvers**: Spawns concurrent network probes designed with zero socket allocation leakage.\n* **Threat Mapping**: Real-time identification of standard ports (SSH, HTTP, database tunnels) mapping malicious signatures against the forge's security matrices.\n* **Sci-Fi Diagnostics Console**: An exquisite, visual-rich web control panel rendering socket flows down to sub-millisecond updates.",
       "image": "/src/assets/images/regenerated_image_1781023425937.png",
       "bannerImage": "/src/assets/images/regenerated_image_1781023425937.png",
-      "tags": ["Network Scanner", "Raw Sockets", "Packet Inspection", "Cyber Security", "Rust Engine"],
-      "role": "Lead Architect & Systems Engineer",
+      "tags": [
+        "Network Scanner",
+        "Raw Sockets",
+        "Packet Inspection"
+      ],
+      "role": "Independent Developer (FOUNDER)",
       "client": "Internal R&D / Open-source security community",
       "timeline": "May 2026 - Present",
-      "githubUrl": "https://github.com/mythicsforge/mythics-shield",
-      "liveUrl": "#",
       "isFeatured": true,
       "stats": [
-        { "label": "Analysis Rate", "value": "1.2M pps" },
-        { "label": "Threat Catch Rate", "value": "99.8%" },
-        { "label": "Console Latency", value: "<0.5ms" }
+        {
+          "label": "Analysis Rate",
+          "value": "1.2M pps"
+        },
+        {
+          "label": "Threat Catch Rate",
+          "value": "99.8%"
+        },
+        {
+          "label": "Console Latency",
+          "value": "<0.5ms"
+        }
       ]
     }
   ],
@@ -40,7 +51,7 @@
     "tagline": "We Build Future",
     "description": "An elite, independent digital craft studio operated by a solo developer. Designing low-latency system-level tools, high-fidelity WebGL graphics pipelines, and resilient full-stack architectures.",
     "logoText": "MF",
-    "logoImageUrl": "",
+    "logoImageUrl": "/src/assets/images/regenerated_image_1781023425937.png",
     "logoAlignment": "center",
     "logoObjectPosition": "center",
     "logoScale": "medium"

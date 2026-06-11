@@ -10,6 +10,10 @@ import {
   Download, Upload, HeartHandshake, Eye, EyeOff
 } from "lucide-react";
 import { Project, ChroniclePost, StudioSettings } from "../types";
+// @ts-ignore
+import shieldImage from "../assets/images/regenerated_image_1781023425937.png";
+// @ts-ignore
+import logoSvg from "../assets/images/logo.svg";
 
 interface CreatorConsoleProps {
   projects: Project[];
@@ -528,82 +532,30 @@ export default function CreatorConsole({
                     />
                   </div>
 
-                  {/* Logo Image File Upload Component */}
+                  {/* Logo Image - PERMANENT ORIGINAL LOGO NOTICE */}
                   <div className="sm:col-span-2">
                     <label className="block text-[10px] text-[#FF5E13] font-mono uppercase mb-1 font-bold">
-                      Upload Custom Logo Image
+                      Logo Asset Status
                     </label>
-                    
-                    {settingsForm.logoImageUrl ? (
-                      <div className="bg-[#030303] border border-white/10 rounded-xl p-3 flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full border border-white/10 overflow-hidden bg-black shrink-0 flex items-center justify-center relative">
-                            <img
-                              src={settingsForm.logoImageUrl}
-                              alt="Custom Logo Preview"
-                              referrerPolicy="no-referrer"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <p className="text-xs text-white font-bold font-sans">Active Custom Logo</p>
-                            <p className="text-[10px] text-white/40 font-mono">Image saved in browser storage</p>
-                          </div>
+                    <div className="bg-[#030303] border border-emerald-900/30 rounded-xl p-3 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full border border-emerald-500/20 overflow-hidden bg-black shrink-0 flex items-center justify-center relative">
+                          <img
+                            src={logoSvg}
+                            alt="Mythics Forge Original Logo"
+                            referrerPolicy="no-referrer"
+                            className="w-10 h-10 object-contain"
+                          />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSettingsForm(prev => ({ ...prev, logoImageUrl: "" }));
-                            triggerAlertMessage("♻️ CUSTOM LOGO REMOVED. RESTORED TYPEWRITER SYMBOL!");
-                          }}
-                          className="px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-900/40 hover:border-red-500/50 rounded-lg text-[10px] font-mono uppercase transition-all duration-200 cursor-pointer"
-                        >
-                          Wipe Image
-                        </button>
-                      </div>
-                    ) : (
-                      <div
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                          setIsDraggingLogo(true);
-                        }}
-                        onDragLeave={() => setIsDraggingLogo(false)}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          setIsDraggingLogo(false);
-                          if (e.dataTransfer.files?.[0]) {
-                            handleLogoFileChange(e.dataTransfer.files[0]);
-                          }
-                        }}
-                        onClick={() => document.getElementById("logo-file-picker")?.click()}
-                        className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all duration-300 relative group flex flex-col items-center justify-center gap-2 ${
-                          isDraggingLogo
-                            ? "border-[#FF5E13] bg-[#FF5E13]/10"
-                            : "border-white/10 bg-[#030303] hover:border-[#FF5E13]/40 hover:bg-white/[0.02]"
-                        }`}
-                      >
-                        <input
-                          id="logo-file-picker"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            if (e.target.files?.[0]) {
-                              handleLogoFileChange(e.target.files[0]);
-                            }
-                          }}
-                        />
-                        <Upload className={`w-6 h-6 ${isDraggingLogo ? "text-[#FF5E13] animate-bounce" : "text-white/40 group-hover:text-[#FF5E13]"}`} />
                         <div>
-                          <p className="text-xs text-white/80 font-sans font-medium">
-                            <span className="text-[#FF5E13] font-bold">Drag & drop logo file</span> or <span className="underline font-bold">click to browse</span>
-                          </p>
-                          <p className="text-[10px] text-white/30 font-mono mt-0.5">
-                            PNG, JPG, or SVG relative constructs
-                          </p>
+                          <p className="text-xs text-emerald-400 font-bold font-sans">🛡️ Original Logo Permanent</p>
+                          <p className="text-[10px] text-white/40 font-mono">Original branding enforced across all networks</p>
                         </div>
                       </div>
-                    )}
+                      <span className="px-2.5 py-1 bg-emerald-950/40 border border-emerald-900/40 rounded text-[9px] font-mono text-emerald-400 uppercase tracking-widest">
+                        LOCKED
+                      </span>
+                    </div>
                   </div>
                 </div>
 

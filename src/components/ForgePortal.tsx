@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
 import CreatorConsole from "./CreatorConsole";
-import LoreweaverCompanion from "./LoreweaverCompanion";
 import EmptyCategoryPanel from "./EmptyCategoryPanel";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -565,9 +564,6 @@ export default function ForgePortal({
         </div>
       </footer>
       
-      {/* LOREWEAVER AI COMPANION COMPONENT */}
-      <LoreweaverCompanion projects={projects} />
-
       {/* PORTFOLIO PROJECT CASE STUDY MODAL */}
       <AnimatePresence>
         {selectedProject && (
