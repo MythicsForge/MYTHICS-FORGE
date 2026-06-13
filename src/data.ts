@@ -21,6 +21,7 @@ export const INITIAL_PROJECTS: Project[] = [
     role: "Independent Developer (FOUNDER)",
     client: "Internal R&D / Open-source security community",
     timeline: "May 2026 - Present",
+    gumroadUrl: "https://mythicsforge.gumroad.com/l/ronce",
     isFeatured: true,
     stats: [
       { label: "Analysis Rate", value: "1.2M pps" },

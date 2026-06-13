@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Project, ChroniclePost, StudioSettings } from "./types";
 import { INITIAL_PROJECTS, INITIAL_CHRONICLES } from "./data";
 import ForgePortal from "./components/ForgePortal";
+import { useAdSenseLoader } from "./components/AdSenseUnit";
 // @ts-ignore
 import shieldImage from "./assets/images/regenerated_image_1781023425937.png";
 // @ts-ignore
@@ -20,7 +21,10 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   logoImageUrl: logoSvg,
   logoAlignment: "center",
   logoObjectPosition: "center",
-  logoScale: "medium"
+  logoScale: "medium",
+  adsenseClientId: (import.meta as any).env?.VITE_ADSENSE_CLIENT_ID || "ca-pub-6769729759407935",
+  adsenseAutoAdsEnabled: false,
+  adsenseShowBannerUnderProjects: true
 };
 
 export default function App() {
@@ -46,6 +50,7 @@ export default function App() {
             filtered[existingIdx].bannerImage = initProj.bannerImage;
             filtered[existingIdx].image = initProj.image;
             filtered[existingIdx].role = initProj.role;
+            filtered[existingIdx].gumroadUrl = initProj.gumroadUrl;
           }
         });
         return filtered;
@@ -100,6 +105,9 @@ export default function App() {
 
   const [hasLoadedFromServer, setHasLoadedFromServer] = useState(false);
 
+  // Load AdSense Global Script if configured
+  useAdSenseLoader(studioSettings.adsenseClientId, studioSettings.adsenseAutoAdsEnabled);
+
   // Load unified system state from persistent server file on startup
   useEffect(() => {
     fetch("/api/state")
@@ -117,6 +125,7 @@ export default function App() {
                   ...proj,
                   image: matched.image,
                   bannerImage: matched.bannerImage,
+                  gumroadUrl: matched.gumroadUrl,
                 };
               }
               return proj;
@@ -129,6 +138,9 @@ export default function App() {
           if (serverState.studioSettings) {
             const loadedSettings = { ...serverState.studioSettings };
             loadedSettings.logoImageUrl = logoSvg;
+            if (!loadedSettings.adsenseClientId) {
+              loadedSettings.adsenseClientId = "ca-pub-6769729759407935";
+            }
             setStudioSettings(loadedSettings);
           }
         }

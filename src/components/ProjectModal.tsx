@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Project } from "../types";
+import { Project, StudioSettings } from "../types";
 import { X, ExternalLink, Github, Calendar, User, Briefcase, BarChart2, Shield } from "lucide-react";
 import { motion } from "motion/react";
+import AdSenseUnit from "./AdSenseUnit";
 
 interface ProjectModalProps {
   project: Project;
   onClose: () => void;
+  studioSettings: StudioSettings;
 }
 
 // Simple and robust parser to render case study markdown smoothly in React 19 without package conflicts
@@ -65,7 +67,7 @@ const parseMarkdown = (text: string) => {
   });
 };
 
-export default function ProjectModal({ project, onClose }: ProjectModalProps) {
+export default function ProjectModal({ project, onClose, studioSettings }: ProjectModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
       <motion.div
@@ -118,6 +120,28 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
             <div className="prose prose-invert max-w-none">
               {parseMarkdown(project.description)}
             </div>
+
+            {project.gumroadUrl && (
+              <div className="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/[0.01] border border-white/[0.03] p-5 rounded-2xl">
+                <div className="space-y-1 text-center sm:text-left">
+                  <h5 className="text-white font-bold text-sm">Deploy this system natively</h5>
+                  <p className="text-white/40 text-[11px]">Acquire the fully compiled binary and configuration archives directly on Gumroad.</p>
+                </div>
+                <a
+                  href={project.gumroadUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#22C55E] to-[#10B981] hover:from-[#10B981] hover:to-[#22C55E] text-white font-black text-xs tracking-widest uppercase rounded-xl hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 border border-emerald-400/25 shrink-0"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Buy from Gumroad
+                </a>
+              </div>
+            )}
+
+            {studioSettings.adsenseShowBannerUnderProjects !== false && (
+              <AdSenseUnit studioSettings={studioSettings} slotId={`modal-${project.id}`} />
+            )}
           </div>
 
           {/* Right Column: Meta-Specs / Technical Ledger */}
@@ -185,8 +209,19 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
             </div>
 
             {/* Launch Links */}
-            {(project.githubUrl || project.liveUrl) && (
+            {(project.githubUrl || project.liveUrl || project.gumroadUrl) && (
               <div className="pt-4 border-t border-white/[0.06] space-y-2.5">
+                {project.gumroadUrl && (
+                  <a
+                    href={project.gumroadUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-3 px-4 bg-gradient-to-r from-[#22C55E] to-[#10B981] hover:from-[#10B981] hover:to-[#22C55E] text-white font-extrabold text-xs tracking-widest uppercase rounded-full hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 border border-emerald-400/25"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Buy from Gumroad
+                  </a>
+                )}
                 {project.liveUrl && (
                   <a
                     href={project.liveUrl}

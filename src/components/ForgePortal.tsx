@@ -14,6 +14,7 @@ import {
 import ProjectModal from "./ProjectModal";
 import CreatorConsole from "./CreatorConsole";
 import EmptyCategoryPanel from "./EmptyCategoryPanel";
+import AdSenseUnit from "./AdSenseUnit";
 import { motion, AnimatePresence } from "motion/react";
 
 interface ForgePortalProps {
@@ -491,9 +492,24 @@ export default function ForgePortal({
 
                       {/* Operational launch panel overlay */}
                       <div className="flex items-center justify-between text-[10px] font-mono pt-1">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] tracking-widest uppercase font-extrabold transition-all duration-300 flex items-center gap-1.5">
-                          INSPECT CASE STUDY <ArrowRight className="w-3.5 h-3.5 text-[#EC4899] group-hover:translate-x-1 transition-transform" />
-                        </span>
+                        <div className="flex items-center gap-3.5 flex-wrap">
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] tracking-widest uppercase font-extrabold transition-all duration-300 flex items-center gap-1.5">
+                            INSPECT CASE STUDY <ArrowRight className="w-3.5 h-3.5 text-[#EC4899] group-hover:translate-x-1 transition-transform" />
+                          </span>
+
+                          {proj.gumroadUrl && (
+                            <a
+                              href={proj.gumroadUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="px-3 py-1 bg-gradient-to-r from-[#22C55E] to-[#10B981] hover:from-[#10B981] hover:to-[#22C55E] text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg flex items-center gap-1 shadow-md hover:scale-105 transition-all duration-200 border border-emerald-400/20"
+                            >
+                              <span>Buy from Gumroad</span>
+                              <ExternalLink className="w-3 h-3 text-white" />
+                            </a>
+                          )}
+                        </div>
 
                         {/* Display Performance spec pill */}
                         {proj.stats?.[0] && (
@@ -534,6 +550,13 @@ export default function ForgePortal({
 
       </main>
 
+      {/* Dynamic Google AdSense Banner or Sandbox mockup */}
+      {studioSettings.adsenseShowBannerUnderProjects !== false && (
+        <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10 -mt-6">
+          <AdSenseUnit studioSettings={studioSettings} slotId="home-footer-banner" />
+        </div>
+      )}
+
       {/* FOOTER */}
       <footer className="shrink-0 bg-[#070611]/60 backdrop-blur-xl border-t border-white/[0.06] mt-16 p-6 md:p-8 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -570,6 +593,7 @@ export default function ForgePortal({
           <ProjectModal
             project={selectedProject}
             onClose={() => setSelectedProject(null)}
+            studioSettings={studioSettings}
           />
         )}
       </AnimatePresence>

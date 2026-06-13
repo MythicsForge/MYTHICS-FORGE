@@ -23,6 +23,7 @@ export interface Project {
   timeline: string;
   githubUrl?: string;
   liveUrl?: string;
+  gumroadUrl?: string;
   stats?: ProjectStat[];
   isFeatured?: boolean;
 }
@@ -54,4 +55,7 @@ export interface StudioSettings {
   logoAlignment?: "left" | "center" | "right";
   logoObjectPosition?: "center" | "top" | "bottom" | "left" | "right";
   logoScale?: "small" | "medium" | "large";
+  adsenseClientId?: string;
+  adsenseAutoAdsEnabled?: boolean;
+  adsenseShowBannerUnderProjects?: boolean;
 }
