@@ -3,15 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Project, StudioSettings } from "../types";
+import { Project } from "../types";
 import { X, ExternalLink, Github, Calendar, User, Briefcase, BarChart2, Shield } from "lucide-react";
 import { motion } from "motion/react";
-import AdSenseUnit from "./AdSenseUnit";
 
 interface ProjectModalProps {
   project: Project;
   onClose: () => void;
-  studioSettings: StudioSettings;
 }
 
 // Simple and robust parser to render case study markdown smoothly in React 19 without package conflicts
@@ -67,7 +65,7 @@ const parseMarkdown = (text: string) => {
   });
 };
 
-export default function ProjectModal({ project, onClose, studioSettings }: ProjectModalProps) {
+export default function ProjectModal({ project, onClose }: ProjectModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
       <motion.div
@@ -139,9 +137,7 @@ export default function ProjectModal({ project, onClose, studioSettings }: Proje
               </div>
             )}
 
-            {studioSettings.adsenseShowBannerUnderProjects !== false && (
-              <AdSenseUnit studioSettings={studioSettings} slotId={`modal-${project.id}`} />
-            )}
+
           </div>
 
           {/* Right Column: Meta-Specs / Technical Ledger */}

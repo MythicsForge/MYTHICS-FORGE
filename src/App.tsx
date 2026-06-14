@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { Project, ChroniclePost, StudioSettings } from "./types";
 import { INITIAL_PROJECTS, INITIAL_CHRONICLES } from "./data";
 import ForgePortal from "./components/ForgePortal";
-import { useAdSenseLoader } from "./components/AdSenseUnit";
 // @ts-ignore
 import shieldImage from "./assets/images/regenerated_image_1781023425937.png";
 // @ts-ignore
@@ -21,10 +20,7 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   logoImageUrl: logoSvg,
   logoAlignment: "center",
   logoObjectPosition: "center",
-  logoScale: "medium",
-  adsenseClientId: (import.meta as any).env?.VITE_ADSENSE_CLIENT_ID || "ca-pub-6769729759407935",
-  adsenseAutoAdsEnabled: false,
-  adsenseShowBannerUnderProjects: true
+  logoScale: "medium"
 };
 
 export default function App() {
@@ -105,9 +101,6 @@ export default function App() {
 
   const [hasLoadedFromServer, setHasLoadedFromServer] = useState(false);
 
-  // Load AdSense Global Script if configured
-  useAdSenseLoader(studioSettings.adsenseClientId, studioSettings.adsenseAutoAdsEnabled);
-
   // Load unified system state from persistent server file on startup
   useEffect(() => {
     fetch("/api/state")
@@ -138,9 +131,6 @@ export default function App() {
           if (serverState.studioSettings) {
             const loadedSettings = { ...serverState.studioSettings };
             loadedSettings.logoImageUrl = logoSvg;
-            if (!loadedSettings.adsenseClientId) {
-              loadedSettings.adsenseClientId = "ca-pub-6769729759407935";
-            }
             setStudioSettings(loadedSettings);
           }
         }

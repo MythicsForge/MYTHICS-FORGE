@@ -49,10 +49,7 @@ export default function CreatorConsole({
     logoImageUrl: studioSettings.logoImageUrl,
     logoAlignment: studioSettings.logoAlignment || "center",
     logoObjectPosition: studioSettings.logoObjectPosition || "center",
-    logoScale: studioSettings.logoScale || "medium",
-    adsenseClientId: studioSettings.adsenseClientId || "",
-    adsenseAutoAdsEnabled: !!studioSettings.adsenseAutoAdsEnabled,
-    adsenseShowBannerUnderProjects: studioSettings.adsenseShowBannerUnderProjects !== false
+    logoScale: studioSettings.logoScale || "medium"
   });
 
   const [isDraggingLogo, setIsDraggingLogo] = useState(false);
@@ -85,10 +82,7 @@ export default function CreatorConsole({
       logoImageUrl: studioSettings.logoImageUrl,
       logoAlignment: studioSettings.logoAlignment || "center",
       logoObjectPosition: studioSettings.logoObjectPosition || "center",
-      logoScale: studioSettings.logoScale || "medium",
-      adsenseClientId: studioSettings.adsenseClientId || "",
-      adsenseAutoAdsEnabled: !!studioSettings.adsenseAutoAdsEnabled,
-      adsenseShowBannerUnderProjects: studioSettings.adsenseShowBannerUnderProjects !== false
+      logoScale: studioSettings.logoScale || "medium"
     });
   }, [studioSettings]);
 
@@ -102,12 +96,9 @@ export default function CreatorConsole({
       logoImageUrl: settingsForm.logoImageUrl,
       logoAlignment: settingsForm.logoAlignment as "left" | "center" | "right",
       logoObjectPosition: settingsForm.logoObjectPosition as "center" | "top" | "bottom" | "left" | "right",
-      logoScale: settingsForm.logoScale as "small" | "medium" | "large",
-      adsenseClientId: settingsForm.adsenseClientId,
-      adsenseAutoAdsEnabled: settingsForm.adsenseAutoAdsEnabled,
-      adsenseShowBannerUnderProjects: settingsForm.adsenseShowBannerUnderProjects
+      logoScale: settingsForm.logoScale as "small" | "medium" | "large"
     });
-    triggerAlertMessage("🔥 BRANDING & GOOGLE ADSENSE PREFERENCES COMMITTED!");
+    triggerAlertMessage("🔥 BRANDING & COMPANY IDENTITY METAMORPHED SUCCESSFULLY!");
   };
 
   // Editing state variables
@@ -642,87 +633,6 @@ export default function CreatorConsole({
                     placeholder="Short, highly polished, informative background overview about your services..."
                     className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-xl px-3.5 py-2 text-xs text-slate-350 outline-none leading-relaxed"
                   />
-                </div>
-
-                {/* Google AdSense Integration Console */}
-                <div className="bg-[#1A0E23]/30 border border-purple-500/10 p-5 rounded-2xl space-y-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🪙</span>
-                    <div>
-                      <h5 className="text-white text-xs font-bold uppercase tracking-wide">Google AdSense Integration Matrix</h5>
-                      <p className="text-[10px] text-white/45 font-mono">Connect this digital forge with your Google AdSense Account to monetize</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                    {/* Publisher Client ID */}
-                    <div className="md:col-span-2">
-                      <label className="block text-[10px] text-purple-400 font-mono uppercase mb-1.5 font-bold">AdSense Publisher ID (Client ID)</label>
-                      <input
-                        type="text"
-                        value={settingsForm.adsenseClientId}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, adsenseClientId: e.target.value })}
-                        placeholder="e.g. ca-pub-1234567890123456"
-                        className="w-full bg-black/60 border border-purple-500/20 focus:border-purple-400/50 rounded-xl px-3.5 py-2 text-xs text-purple-200 outline-none font-mono placeholder:text-purple-500/20"
-                      />
-                      <p className="text-[9px] text-white/30 font-mono mt-1">Copy the client attribute from your Google AdSense tag.</p>
-                    </div>
-
-                    {/* Auto Ads Toggle */}
-                    <div>
-                      <label className="block text-[10px] text-purple-400 font-mono uppercase mb-2 font-bold">Global Auto Ads</label>
-                      <button
-                        type="button"
-                        onClick={() => setSettingsForm({ ...settingsForm, adsenseAutoAdsEnabled: !settingsForm.adsenseAutoAdsEnabled })}
-                        className={`w-full py-2 px-3 rounded-xl text-xs font-mono font-bold transition-all border flex items-center justify-between cursor-pointer ${
-                          settingsForm.adsenseAutoAdsEnabled
-                            ? "bg-purple-950/40 border-purple-500/40 text-purple-300"
-                            : "bg-black/40 border-white/10 text-white/40"
-                        }`}
-                      >
-                        <span>{settingsForm.adsenseAutoAdsEnabled ? "● WEB ADS LIVE" : "○ ADS MUTED"}</span>
-                        <div className={`w-2.5 h-2.5 rounded-full ${settingsForm.adsenseAutoAdsEnabled ? "bg-purple-400 animate-pulse" : "bg-white/10"}`} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Show Ad Banners under Projects */}
-                    <div>
-                      <label className="block text-[10px] text-purple-400 font-mono uppercase mb-1.5 font-bold">Showcase Ad Banners Placement</label>
-                      <div className="flex gap-1 bg-black/40 p-1 border border-white/5 rounded-xl">
-                        <button
-                          type="button"
-                          onClick={() => setSettingsForm({ ...settingsForm, adsenseShowBannerUnderProjects: true })}
-                          className={`flex-1 py-1.5 rounded-lg text-[10px] uppercase font-mono font-bold transition-all cursor-pointer ${
-                            settingsForm.adsenseShowBannerUnderProjects
-                              ? "bg-purple-650 text-white shadow-sm font-black bg-purple-600"
-                              : "text-white/40 hover:text-white"
-                          }`}
-                        >
-                          Enable Units
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSettingsForm({ ...settingsForm, adsenseShowBannerUnderProjects: false })}
-                          className={`flex-1 py-1.5 rounded-lg text-[10px] uppercase font-mono font-bold transition-all cursor-pointer ${
-                            !settingsForm.adsenseShowBannerUnderProjects
-                              ? "bg-purple-600 text-white shadow-sm font-black"
-                              : "text-white/40 hover:text-white"
-                          }`}
-                        >
-                          Hide Units
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Quick Guidance */}
-                    <div className="bg-black/35 rounded-xl p-3 border border-white/5 flex flex-col justify-center">
-                      <p className="text-[10px] text-white/50 leading-relaxed">
-                        💡 <strong>How to activate:</strong> Update your publisher ID above, then save. The system will dynamically inject the Google Ads script natively. If you don't have an ID yet, the app displays high-fidelity simulated placeholders.
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="flex justify-end pt-1">

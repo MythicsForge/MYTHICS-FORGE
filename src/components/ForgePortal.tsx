@@ -14,7 +14,6 @@ import {
 import ProjectModal from "./ProjectModal";
 import CreatorConsole from "./CreatorConsole";
 import EmptyCategoryPanel from "./EmptyCategoryPanel";
-import AdSenseUnit from "./AdSenseUnit";
 import { motion, AnimatePresence } from "motion/react";
 
 interface ForgePortalProps {
@@ -550,13 +549,6 @@ export default function ForgePortal({
 
       </main>
 
-      {/* Dynamic Google AdSense Banner or Sandbox mockup */}
-      {studioSettings.adsenseShowBannerUnderProjects !== false && (
-        <div className="max-w-7xl mx-auto px-6 md:px-8 relative z-10 -mt-6">
-          <AdSenseUnit studioSettings={studioSettings} slotId="home-footer-banner" />
-        </div>
-      )}
-
       {/* FOOTER */}
       <footer className="shrink-0 bg-[#070611]/60 backdrop-blur-xl border-t border-white/[0.06] mt-16 p-6 md:p-8 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -593,7 +585,6 @@ export default function ForgePortal({
           <ProjectModal
             project={selectedProject}
             onClose={() => setSelectedProject(null)}
-            studioSettings={studioSettings}
           />
         )}
       </AnimatePresence>
