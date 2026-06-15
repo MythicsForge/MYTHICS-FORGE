@@ -14,6 +14,7 @@ import {
 import ProjectModal from "./ProjectModal";
 import CreatorConsole from "./CreatorConsole";
 import EmptyCategoryPanel from "./EmptyCategoryPanel";
+import LegalAndSupportModal from "./LegalAndSupportModal";
 import { motion, AnimatePresence } from "motion/react";
 
 interface ForgePortalProps {
@@ -49,6 +50,20 @@ export default function ForgePortal({
 
   // Controls drawer consoles
   const [showConsole, setShowConsole] = useState(false);
+
+  // Legal Trust portal & cookie preferences trackers (Google AdSense compliance guidelines)
+  const [activeLegalTab, setActiveLegalTab] = useState<"privacy" | "terms" | "contact" | null>(null);
+  const [showConsentBanner, setShowConsentBanner] = useState(false);
+
+  useEffect(() => {
+    const savedChoice = localStorage.getItem("mythics_forge_cookie_choice");
+    if (!savedChoice) {
+      const displayTimer = setTimeout(() => {
+        setShowConsentBanner(true);
+      }, 1500);
+      return () => clearTimeout(displayTimer);
+    }
+  }, []);
 
   // Coordinate static/dynamic server coordinate clocks of 2026-06-09
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -567,6 +582,33 @@ export default function ForgePortal({
               <span className="text-[9px] uppercase tracking-[0.2em] opacity-35 font-bold font-sans">Location</span>
               <span className="text-xs font-mono text-white/70 tracking-tighter">LAT_40.7128_N_74.0060_W</span>
             </div>
+
+            {/* Legal Trust compliance pathways (Cookie Notice, Terms, Support Hub) */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[9px] uppercase tracking-[0.2em] opacity-35 font-bold font-sans">Trust & Compliance</span>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-mono">
+                <button 
+                  onClick={() => setActiveLegalTab("privacy")} 
+                  className="hover:text-[#EC4899] text-white/60 transition-colors cursor-pointer text-left text-xs"
+                >
+                  Privacy Policy
+                </button>
+                <span className="text-white/10 select-none hidden sm:inline">•</span>
+                <button 
+                  onClick={() => setActiveLegalTab("terms")} 
+                  className="hover:text-[#EC4899] text-white/60 transition-colors cursor-pointer text-left text-xs"
+                >
+                  Terms of Service
+                </button>
+                <span className="text-white/10 select-none hidden sm:inline">•</span>
+                <button 
+                  onClick={() => setActiveLegalTab("contact")} 
+                  className="hover:text-[#EC4899] text-[#EC4899]/90 font-bold transition-colors cursor-pointer text-left text-xs"
+                >
+                  Support & Contacts
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-6">
@@ -586,6 +628,59 @@ export default function ForgePortal({
             project={selectedProject}
             onClose={() => setSelectedProject(null)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* LEGAL COMPLIANCE & CLIENT SUPPORT HUB MODULES */}
+      <AnimatePresence>
+        {activeLegalTab && (
+          <LegalAndSupportModal 
+            activeTab={activeLegalTab} 
+            onClose={() => setActiveLegalTab(null)} 
+          />
+        )}
+      </AnimatePresence>
+
+      {/* STATEFUL COOKIE & AD CHOICE CONSENT BANNER (GDPR / GOOGLE COMPLIANCY) */}
+      <AnimatePresence>
+        {showConsentBanner && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:max-w-md bg-[#0F0E20]/95 backdrop-blur-xl border border-white/[0.08] p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-50 text-sans"
+          >
+            <div className="space-y-3.5">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">🛡️</span>
+                <h5 className="text-[11px] font-mono text-white tracking-widest uppercase font-bold">COOKIES & AD_CHOICE CONSENT</h5>
+              </div>
+              <p className="text-[10px] md:text-xs text-white/60 leading-relaxed font-light font-sans">
+                Mythics Forge relies on standard client identifiers and tailors promotional sponsor banners. Review our fully compliant <button onClick={() => { setActiveLegalTab("privacy"); setShowConsentBanner(false); }} className="text-indigo-400 hover:underline cursor-pointer">Privacy Policy</button> to read about third-party Google cookies, active data logs, and options to opt-out.
+              </p>
+              <div className="flex items-center gap-2 pt-1 font-mono text-[9px]">
+                <button
+                  onClick={() => {
+                    localStorage.setItem("mythics_forge_cookie_choice", "accepted");
+                    setShowConsentBanner(false);
+                  }}
+                  className="flex-1 py-2 bg-gradient-to-r from-indigo-650 to-purple-650 hover:from-purple-650 hover:to-indigo-650 text-white font-extrabold uppercase rounded-lg transition-colors cursor-pointer bg-indigo-600 text-center"
+                >
+                  Accept Choices
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.setItem("mythics_forge_cookie_choice", "declined");
+                    setShowConsentBanner(false);
+                  }}
+                  className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white rounded-lg border border-white/10 transition-colors cursor-pointer text-center"
+                >
+                  Decline All
+                </button>
+              </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

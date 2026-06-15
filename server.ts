@@ -47,6 +47,51 @@ app.post("/api/state", (req, res) => {
   }
 });
 
+// Real interactive contact submission logger
+const CONTACT_LOG_PATH = path.join(process.cwd(), "mythics_contact_logs.json");
+
+// Google Search Console HTML File verification route
+app.get("/googleujm_KxnqUiW8GpVkXSeuQBk2IpKec8luLjv1ZtfgHh0.html", (req, res) => {
+  res.setHeader("Content-Type", "text/html");
+  res.send("google-site-verification: googleujm_KxnqUiW8GpVkXSeuQBk2IpKec8luLjv1ZtfgHh0.html");
+});
+
+app.post("/api/contact", (req, res) => {
+  try {
+    const { name, email, subject, message, token } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "All active attributes required to project signal." });
+    }
+
+    const newContactLog = {
+      token,
+      timestamp: new Date().toISOString(),
+      name,
+      email,
+      subject,
+      message
+    };
+
+    let existingLogs = [];
+    if (fs.existsSync(CONTACT_LOG_PATH)) {
+      try {
+        existingLogs = JSON.parse(fs.readFileSync(CONTACT_LOG_PATH, "utf8"));
+      } catch (e) {
+        existingLogs = [];
+      }
+    }
+
+    existingLogs.push(newContactLog);
+    fs.writeFileSync(CONTACT_LOG_PATH, JSON.stringify(existingLogs, null, 2), "utf8");
+
+    console.log(`✉️ Incoming Communications Relay Registered [${token}] from ${name} (${email})`);
+    return res.json({ success: true, message: "Communications packet logged safely on the server array.", token });
+  } catch (error: any) {
+    console.error("Error saving communications trace:", error);
+    return res.status(500).json({ error: "Transmission logging failure: " + error.message });
+  }
+});
+
 // Configure Vite or Serve Production Assets
 async function setupServer() {
   if (process.env.NODE_ENV !== "production") {
