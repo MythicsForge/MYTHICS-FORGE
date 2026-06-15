@@ -562,6 +562,62 @@ export default function ForgePortal({
           </section>
         )}
 
+        {/* 3. RESEARCH LEDGER & INTELLECTUAL CHRONICLES */}
+        {chronicles.length > 0 && (
+          <section id="intellectual-chronicles-hub" className="space-y-6 pt-6 relative z-10">
+            <div className="border-b border-white/[0.06] pb-4">
+              <h3 className="text-xs font-serif tracking-[0.25em] font-extrabold text-[#EC4899] uppercase flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-[#EC4899]" /> RESEARCH LEDGER & INTELLECTUAL CHRONICLES
+              </h3>
+              <p className="text-xs text-white/50 font-sans tracking-wide font-light">
+                Detailed developer diagnostics, WebGL mesh blueprint analysis, parametric math equations, and user trust guidelines.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {chronicles.map((post) => (
+                <article
+                  key={post.id}
+                  id={`chronicle-card-${post.id}`}
+                  onClick={() => setSelectedChronicle(post)}
+                  className="group bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.05] hover:border-[#4F46E5]/40 transition-all duration-300 rounded-[2rem] p-5 flex flex-col justify-between cursor-pointer space-y-4 hover:shadow-[0_15px_35px_rgba(79,70,229,0.05)] backdrop-blur-md"
+                >
+                  <div className="space-y-3.5">
+                    <div className="aspect-[16/10] overflow-hidden rounded-[1.4rem] border border-white/[0.05] relative bg-black">
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75 group-hover:brightness-90 animate-fade-in"
+                      />
+                      <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-black/85 backdrop-blur-md border border-white/10 text-[8px] font-mono uppercase tracking-widest rounded-lg text-white/90">
+                        {post.category}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1.5 px-0.5">
+                      <span className="text-[9px] text-[#EC4899] font-mono tracking-wider uppercase font-bold">{post.date}</span>
+                      <h4 className="font-serif text-sm text-white font-extrabold line-clamp-2 uppercase group-hover:text-[#EC4899] transition-colors leading-snug">
+                        {post.title}
+                      </h4>
+                      <p className="text-white/50 text-[11px] leading-relaxed line-clamp-3 font-light font-sans mt-1">
+                        {post.summary}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/[0.05] flex items-center justify-between text-[9px] font-mono text-white/45 group-hover:text-white/70 transition-colors px-0.5">
+                    <span>{post.readTime}</span>
+                    <span className="text-indigo-400 font-bold flex items-center gap-1 group-hover:underline">
+                      READ LOG <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
       </main>
 
       {/* FOOTER */}

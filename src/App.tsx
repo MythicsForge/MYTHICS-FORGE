@@ -123,10 +123,23 @@ export default function App() {
               }
               return proj;
             });
+            // Merge any missing initial projects
+            INITIAL_PROJECTS.forEach((initProj) => {
+              if (!sanitized.some(p => p.id === initProj.id)) {
+                sanitized.push(initProj);
+              }
+            });
             setProjects(sanitized);
           }
           if (Array.isArray(serverState.chronicles) && serverState.chronicles.length > 0) {
-            setChronicles(serverState.chronicles);
+            const sanitizedChron = [...serverState.chronicles];
+            // Merge any missing initial chronicles
+            INITIAL_CHRONICLES.forEach((initChron) => {
+              if (!sanitizedChron.some(c => c.id === initChron.id)) {
+                sanitizedChron.push(initChron);
+              }
+            });
+            setChronicles(sanitizedChron);
           }
           if (serverState.studioSettings) {
             const loadedSettings = { ...serverState.studioSettings };
