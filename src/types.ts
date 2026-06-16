@@ -55,4 +55,10 @@ export interface StudioSettings {
   logoAlignment?: "left" | "center" | "right";
   logoObjectPosition?: "center" | "top" | "bottom" | "left" | "right";
   logoScale?: "small" | "medium" | "large";
+  facebookUrl?: string;
+  discordUrl?: string;
+  gumroadUrl?: string;
+  redditUrl?: string;
+  linkedinUrl?: string;
+  instagramUrl?: string;
 }

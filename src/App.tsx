@@ -20,8 +20,37 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   logoImageUrl: logoSvg,
   logoAlignment: "center",
   logoObjectPosition: "center",
-  logoScale: "medium"
+  logoScale: "medium",
+  facebookUrl: "https://www.facebook.com/people/Mythics-Forge/61590690214970/",
+  discordUrl: "https://discord.gg/rvXTmMCwJA",
+  gumroadUrl: "https://mythicsforge.gumroad.com",
+  redditUrl: "https://www.reddit.com/user/MythicsForge",
+  linkedinUrl: "https://www.linkedin.com/company/mythics-forge",
+  instagramUrl: "https://www.instagram.com/mythics_forge"
 };
+
+function migrateStudioSettings(settings: StudioSettings): StudioSettings {
+  const updated = { ...settings };
+  if (!updated.facebookUrl || updated.facebookUrl === "https://facebook.com/mythics-forge") {
+    updated.facebookUrl = "https://www.facebook.com/people/Mythics-Forge/61590690214970/";
+  }
+  if (!updated.discordUrl || updated.discordUrl === "https://discord.gg/mythics-forge") {
+    updated.discordUrl = "https://discord.gg/rvXTmMCwJA";
+  }
+  if (!updated.gumroadUrl || updated.gumroadUrl === "https://gumroad.com/mythics-forge") {
+    updated.gumroadUrl = "https://mythicsforge.gumroad.com";
+  }
+  if (!updated.redditUrl || updated.redditUrl === "https://reddit.com/r/mythics-forge") {
+    updated.redditUrl = "https://www.reddit.com/user/MythicsForge";
+  }
+  if (!updated.linkedinUrl || updated.linkedinUrl === "https://linkedin.com/company/mythics-forge") {
+    updated.linkedinUrl = "https://www.linkedin.com/company/mythics-forge";
+  }
+  if (!updated.instagramUrl || updated.instagramUrl === "https://instagram.com/mythics-forge") {
+    updated.instagramUrl = "https://www.instagram.com/mythics_forge";
+  }
+  return updated;
+}
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>(() => {
@@ -91,7 +120,7 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved) as StudioSettings;
         parsed.logoImageUrl = logoSvg;
-        return parsed;
+        return migrateStudioSettings({ ...DEFAULT_STUDIO_SETTINGS, ...parsed });
       }
       return DEFAULT_STUDIO_SETTINGS;
     } catch {
@@ -111,18 +140,20 @@ export default function App() {
       .then((serverState) => {
         if (serverState) {
           if (Array.isArray(serverState.projects) && serverState.projects.length > 0) {
-            const sanitized = serverState.projects.map((proj: Project) => {
-              const matched = INITIAL_PROJECTS.find(p => p.id === proj.id);
-              if (matched) {
-                return {
-                  ...proj,
-                  image: matched.image,
-                  bannerImage: matched.bannerImage,
-                  gumroadUrl: matched.gumroadUrl,
-                };
-              }
-              return proj;
-            });
+            const sanitized = serverState.projects
+              .filter((proj: Project) => INITIAL_PROJECTS.some(p => p.id === proj.id))
+              .map((proj: Project) => {
+                const matched = INITIAL_PROJECTS.find(p => p.id === proj.id);
+                if (matched) {
+                  return {
+                    ...proj,
+                    image: matched.image,
+                    bannerImage: matched.bannerImage,
+                    gumroadUrl: matched.gumroadUrl,
+                  };
+                }
+                return proj;
+              });
             // Merge any missing initial projects
             INITIAL_PROJECTS.forEach((initProj) => {
               if (!sanitized.some(p => p.id === initProj.id)) {
@@ -132,7 +163,7 @@ export default function App() {
             setProjects(sanitized);
           }
           if (Array.isArray(serverState.chronicles) && serverState.chronicles.length > 0) {
-            const sanitizedChron = [...serverState.chronicles];
+            const sanitizedChron = serverState.chronicles.filter(c => INITIAL_CHRONICLES.some(ic => ic.id === c.id));
             // Merge any missing initial chronicles
             INITIAL_CHRONICLES.forEach((initChron) => {
               if (!sanitizedChron.some(c => c.id === initChron.id)) {
@@ -142,7 +173,7 @@ export default function App() {
             setChronicles(sanitizedChron);
           }
           if (serverState.studioSettings) {
-            const loadedSettings = { ...serverState.studioSettings };
+            const loadedSettings = migrateStudioSettings({ ...DEFAULT_STUDIO_SETTINGS, ...serverState.studioSettings });
             loadedSettings.logoImageUrl = logoSvg;
             setStudioSettings(loadedSettings);
           }

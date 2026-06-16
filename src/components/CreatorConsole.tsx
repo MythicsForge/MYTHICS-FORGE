@@ -49,7 +49,13 @@ export default function CreatorConsole({
     logoImageUrl: studioSettings.logoImageUrl,
     logoAlignment: studioSettings.logoAlignment || "center",
     logoObjectPosition: studioSettings.logoObjectPosition || "center",
-    logoScale: studioSettings.logoScale || "medium"
+    logoScale: studioSettings.logoScale || "medium",
+    facebookUrl: studioSettings.facebookUrl || "",
+    discordUrl: studioSettings.discordUrl || "",
+    gumroadUrl: studioSettings.gumroadUrl || "",
+    redditUrl: studioSettings.redditUrl || "",
+    linkedinUrl: studioSettings.linkedinUrl || "",
+    instagramUrl: studioSettings.instagramUrl || ""
   });
 
   const [isDraggingLogo, setIsDraggingLogo] = useState(false);
@@ -82,7 +88,13 @@ export default function CreatorConsole({
       logoImageUrl: studioSettings.logoImageUrl,
       logoAlignment: studioSettings.logoAlignment || "center",
       logoObjectPosition: studioSettings.logoObjectPosition || "center",
-      logoScale: studioSettings.logoScale || "medium"
+      logoScale: studioSettings.logoScale || "medium",
+      facebookUrl: studioSettings.facebookUrl || "",
+      discordUrl: studioSettings.discordUrl || "",
+      gumroadUrl: studioSettings.gumroadUrl || "",
+      redditUrl: studioSettings.redditUrl || "",
+      linkedinUrl: studioSettings.linkedinUrl || "",
+      instagramUrl: studioSettings.instagramUrl || ""
     });
   }, [studioSettings]);
 
@@ -96,7 +108,13 @@ export default function CreatorConsole({
       logoImageUrl: settingsForm.logoImageUrl,
       logoAlignment: settingsForm.logoAlignment as "left" | "center" | "right",
       logoObjectPosition: settingsForm.logoObjectPosition as "center" | "top" | "bottom" | "left" | "right",
-      logoScale: settingsForm.logoScale as "small" | "medium" | "large"
+      logoScale: settingsForm.logoScale as "small" | "medium" | "large",
+      facebookUrl: settingsForm.facebookUrl,
+      discordUrl: settingsForm.discordUrl,
+      gumroadUrl: settingsForm.gumroadUrl,
+      redditUrl: settingsForm.redditUrl,
+      linkedinUrl: settingsForm.linkedinUrl,
+      instagramUrl: settingsForm.instagramUrl
     });
     triggerAlertMessage("🔥 BRANDING & COMPANY IDENTITY METAMORPHED SUCCESSFULLY!");
   };
@@ -633,6 +651,81 @@ export default function CreatorConsole({
                     placeholder="Short, highly polished, informative background overview about your services..."
                     className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-xl px-3.5 py-2 text-xs text-slate-350 outline-none leading-relaxed"
                   />
+                </div>
+
+                {/* Social Portfolio Links */}
+                <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3">
+                  <h5 className="text-[10px] text-[#FF5E13] font-mono uppercase tracking-wider font-bold">
+                    🌐 Social Portfolio Links & Nexus Channels
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Facebook Link */}
+                    <div>
+                      <label className="block text-[9px] text-slate-400 font-mono uppercase mb-1">Facebook URL</label>
+                      <input
+                        type="url"
+                        value={settingsForm.facebookUrl}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, facebookUrl: e.target.value })}
+                        placeholder="https://facebook.com/yourpage"
+                        className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                      />
+                    </div>
+                    {/* Discord Link */}
+                    <div>
+                      <label className="block text-[9px] text-slate-400 font-mono uppercase mb-1">Discord Server Invite</label>
+                      <input
+                        type="url"
+                        value={settingsForm.discordUrl}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, discordUrl: e.target.value })}
+                        placeholder="https://discord.gg/invitecode"
+                        className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                      />
+                    </div>
+                    {/* Gumroad Link */}
+                    <div>
+                      <label className="block text-[9px] text-slate-400 font-mono uppercase mb-1">Gumroad URL</label>
+                      <input
+                        type="url"
+                        value={settingsForm.gumroadUrl}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, gumroadUrl: e.target.value })}
+                        placeholder="https://gumroad.com/yourstore"
+                        className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                      />
+                    </div>
+                    {/* Reddit Link */}
+                    <div>
+                      <label className="block text-[9px] text-slate-400 font-mono uppercase mb-1">Reddit Community URL</label>
+                      <input
+                        type="url"
+                        value={settingsForm.redditUrl}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, redditUrl: e.target.value })}
+                        placeholder="https://reddit.com/r/yourcommunity"
+                        className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                      />
+                    </div>
+                    {/* LinkedIn Link */}
+                    <div>
+                      <label className="block text-[9px] text-slate-400 font-mono uppercase mb-1">LinkedIn Profile/Company URL</label>
+                      <input
+                        type="url"
+                        value={settingsForm.linkedinUrl}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, linkedinUrl: e.target.value })}
+                        placeholder="https://linkedin.com/company/yourcompany"
+                        className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                      />
+                    </div>
+                    {/* Instagram Link */}
+                    <div>
+                      <label className="block text-[9px] text-slate-400 font-mono uppercase mb-1">Instagram Profile URL</label>
+                      <input
+                        type="url"
+                        value={settingsForm.instagramUrl}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, instagramUrl: e.target.value })}
+                        placeholder="https://instagram.com/yourprofile"
+                        className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-end pt-1">
