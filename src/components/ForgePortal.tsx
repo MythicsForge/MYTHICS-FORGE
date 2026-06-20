@@ -3,19 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Project, ChroniclePost, StudioSettings 
 } from "../types";
 import { 
   Flame, Cpu, Globe, Disc, Shield, Clock, BookOpen, 
-  Search, ArrowRight, Github, ExternalLink, SlidersHorizontal, Sparkles, Terminal
+  Search, ArrowRight, Github, ExternalLink, SlidersHorizontal, Sparkles, Terminal,
+  MessageSquareCode, Send, User, Bot, X
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
 import CreatorConsole from "./CreatorConsole";
 import EmptyCategoryPanel from "./EmptyCategoryPanel";
 import LegalAndSupportModal from "./LegalAndSupportModal";
 import { motion, AnimatePresence } from "motion/react";
+import { safeStorage } from "../safeStorage";
 
 interface ForgePortalProps {
   projects: Project[];
@@ -55,8 +57,65 @@ export default function ForgePortal({
   const [activeLegalTab, setActiveLegalTab] = useState<"privacy" | "terms" | "contact" | null>(null);
   const [showConsentBanner, setShowConsentBanner] = useState(false);
 
+  // Hephaestus AI Chat Assistant state and core query pipeline
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatHistory, setChatHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([
+    {
+      role: "assistant",
+      content: `Greetings, traveler. I am Hephaestus, the AI Forge Master. What legendary designs, portfolio items, or Blogger integration scripts shall we sculpt today?`
+    }
+  ]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!chatInput.trim() || isChatLoading) return;
+
+    const userMessage = chatInput.trim();
+    setChatInput("");
+    setChatError(null);
+    
+    const updatedHistory = [...chatHistory, { role: "user" as const, content: userMessage }];
+    setChatHistory(updatedHistory);
+    setIsChatLoading(true);
+
+    try {
+      const res = await fetch("/api/ai/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          history: updatedHistory,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`AI communication broke with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setChatHistory([
+        ...updatedHistory,
+        { role: "assistant" as const, content: data.reply || "My bellows went cold. Ask again..." }
+      ]);
+    } catch (err: any) {
+      console.error("AI Communication Error:", err);
+      setChatError(err.message || "Something went wrong sending that pulse to the matrix.");
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const savedChoice = localStorage.getItem("mythics_forge_cookie_choice");
+    const savedChoice = safeStorage.getItem("mythics_forge_cookie_choice");
     if (!savedChoice) {
       const displayTimer = setTimeout(() => {
         setShowConsentBanner(true);
@@ -87,6 +146,67 @@ export default function ForgePortal({
     }, 8000);
     return () => clearInterval(interval);
   }, [featuredProjects.length]);
+
+  // Reusable Google AdSense Unit Component with real scripts and fallback styling
+  const GoogleAdSenseUnit = ({ placement }: { placement: "header" | "footer" | "sidebar" }) => {
+    if (!studioSettings.adsenseEnabled) return null;
+    if (studioSettings.adsensePlacement !== placement) return null;
+
+    const clientId = studioSettings.adsenseClientId || "ca-pub-1234567890123456";
+    const slotId = studioSettings.adsenseSlotId || "9876543210";
+
+    return (
+      <div 
+        id={`adsense-unit-${placement}`}
+        className={`w-full relative mx-auto my-6 px-4 py-3 rounded-2xl border border-dashed transition-all duration-300 ${
+          placement === "header" 
+            ? "max-w-4xl bg-gradient-to-r from-amber-500/5 via-[#F9AB00]/10 to-amber-500/5 border-[#F9AB00]/20" 
+            : placement === "sidebar"
+            ? "max-w-xs bg-amber-500/5 border-[#F9AB00]/25"
+            : "max-w-5xl bg-gradient-to-r from-[#F9AB00]/5 via-amber-500/5 to-[#F9AB00]/5 border-[#F9AB00]/15"
+        }`}
+      >
+        {/* Subtle decorative AdSense logo element */}
+        <div id="adsense-glow-wrapper" className="flex items-center justify-between text-[10px] font-mono text-[#F9AB00] mb-2 border-b border-white/5 pb-1.5 leading-none">
+          <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#F9AB00] animate-pulse"></span>
+            <span>Google AdSense Authorized Partner</span>
+          </div>
+          <span className="bg-[#F9AB00]/10 px-1.5 py-0.5 rounded text-[8px] uppercase tracking-normal">
+            AD UNIT ACTIVE
+          </span>
+        </div>
+
+        {/* Ad container with real adsbygoogle slot */}
+        <div className="flex items-center justify-center p-2 bg-black/40 border border-white/5 rounded-xl min-h-[90px] overflow-hidden relative">
+          <ins 
+            className="adsbygoogle"
+            style={{ display: "block", minWidth: "250px", height: placement === "sidebar" ? "250px" : "90px" }}
+            data-ad-client={clientId}
+            data-ad-slot={slotId}
+            data-ad-format={placement === "sidebar" ? "rectangle" : "horizontal"}
+            data-full-width-responsive="true"
+          />
+          
+          {/* Ethereal background grid accent */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:14px_24px] opacity-25 pointer-events-none"></div>
+
+          {/* Fallback mockup preview helper inside AI Studio development frame */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 text-center pointer-events-none select-none p-3 border border-dashed border-[#F9AB00]/30 rounded-xl">
+            <div className="text-[11px] font-serif font-bold text-slate-200 tracking-tight">
+              Interactive Google AdSense Advertisement Unit
+            </div>
+            <div className="text-[9px] font-mono text-amber-400 mt-1 uppercase">
+              Publisher: {clientId} | Slot ID: {slotId}
+            </div>
+            <div className="text-[9px] font-sans text-slate-400 mt-0.5">
+              Live banner matches Blogger theme viewport dynamically.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Filter projects by category and search
   const filteredProjects = projects.filter((proj) => {
@@ -132,21 +252,23 @@ export default function ForgePortal({
         {/* Top Branding Nav Header - Dynamic Alignment, Scale, and Positioning */}
         <header className={
           studioSettings.logoAlignment === "left"
-            ? "flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-8 pt-4 gap-6 text-center md:text-left"
+            ? "flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-8 pt-4 gap-6 text-center md:text-left w-full mx-auto"
             : studioSettings.logoAlignment === "right"
-            ? "flex flex-col md:flex-row-reverse md:items-center justify-between border-b border-white/5 pb-8 pt-4 gap-6 text-center md:text-right"
-            : "flex flex-col items-center justify-center text-center border-b border-white/5 pb-8 pt-4 gap-6"
+            ? "flex flex-col md:flex-row-reverse md:items-center justify-between border-b border-white/5 pb-8 pt-4 gap-6 text-center md:text-right w-full mx-auto"
+            : "flex flex-col items-center justify-center text-center border-b border-white/5 pb-8 pt-4 gap-6 w-full mx-auto"
         }>
           <div className={
             studioSettings.logoAlignment === "left"
-              ? "flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 max-w-2xl text-center md:text-left"
+              ? "flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 max-w-2xl text-center md:text-left w-full"
               : studioSettings.logoAlignment === "right"
-              ? "flex flex-col md:flex-row-reverse items-center md:items-start gap-4 md:gap-6 max-w-2xl text-center md:text-right"
-              : "flex flex-col items-center gap-4 max-w-2xl text-center"
+              ? "flex flex-col md:flex-row-reverse items-center md:items-start gap-4 md:gap-6 max-w-2xl text-center md:text-right w-full"
+              : "flex flex-col items-center justify-center gap-4 max-w-2xl text-center w-full mx-auto"
           }>
             {/* Customizable Logo - Floating frameless silhouette with soft edge-fading and ethereal aura */}
             <motion.div 
-              className="relative group shrink-0 select-none z-10"
+              className={`relative group shrink-0 select-none z-10 ${
+                studioSettings.logoAlignment === "center" ? "mx-auto" : "mx-auto md:mx-0"
+              }`}
               animate={{ 
                 y: [0, -10, 0],
                 rotate: [0, 1.2, -1.2, 0]
@@ -161,7 +283,7 @@ export default function ForgePortal({
               <div className="absolute inset-2 bg-gradient-to-tr from-[#4F46E5] to-[#EC4899] opacity-45 blur-2xl group-hover:opacity-65 transition duration-700 pointer-events-none scale-110 rounded-full"></div>
               
               <div 
-                className={`relative flex items-center justify-center transition-all duration-500 hover:scale-[1.04] ${
+                className={`relative flex items-center justify-center transition-all duration-500 hover:scale-[1.04] mx-auto ${
                   studioSettings.logoScale === "small"
                     ? "w-28 h-28"
                     : studioSettings.logoScale === "large"
@@ -177,11 +299,11 @@ export default function ForgePortal({
                   <img 
                     src={studioSettings.logoImageUrl} 
                     alt="Logo" 
-                    className={`w-full h-full object-contain object-${studioSettings.logoObjectPosition || "center"} transition-transform duration-500`}
+                    className={`w-full h-full object-contain mx-auto object-${studioSettings.logoObjectPosition || "center"} transition-transform duration-500`}
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <span className={`relative font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/65 tracking-wide filter drop-shadow-[0_2px_8px_rgba(79,70,229,0.5)] ${
+                  <span className={`relative mx-auto font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/65 tracking-wide filter drop-shadow-[0_2px_8px_rgba(79,70,229,0.5)] ${
                     studioSettings.logoScale === "small"
                       ? "text-2xl"
                       : studioSettings.logoScale === "large"
@@ -199,9 +321,9 @@ export default function ForgePortal({
                 ? "space-y-1.5 mt-2 md:mt-0 text-center md:text-left"
                 : studioSettings.logoAlignment === "right"
                 ? "space-y-1.5 mt-2 md:mt-0 text-center md:text-right"
-                : "space-y-1.5 mt-2 text-center"
+                : "space-y-1.5 mt-2 text-center w-full mx-auto flex flex-col items-center justify-center"
             }>
-              <h1 className="font-serif font-black text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 tracking-tight leading-none select-none">
+              <h1 className="font-serif font-black text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 tracking-tight leading-none select-none text-center">
                 {studioSettings.title || "Mythics Forge"}
               </h1>
               <p className={
@@ -218,7 +340,7 @@ export default function ForgePortal({
                   ? "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto md:mx-0"
                   : studioSettings.logoAlignment === "right"
                   ? "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto md:mr-0"
-                  : "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto"
+                  : "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto text-center"
               }>
                 {studioSettings.description || "An elite, independent digital craft studio."}
               </p>
@@ -269,6 +391,9 @@ export default function ForgePortal({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Google AdSense top banner slot */}
+        <GoogleAdSenseUnit placement="header" />
 
         {/* 1. HERO FEATURED CAROUSEL */}
         {featuredProjects.length > 0 && (
@@ -403,6 +528,9 @@ export default function ForgePortal({
             </div>
           </div>
         </section>
+
+        {/* Google AdSense sidebar ad container block */}
+        <GoogleAdSenseUnit placement="sidebar" />
 
         {/* 2. THE VAULT PORTFOLIO REGISTRY SECTION */}
         {projects.length > 0 && (
@@ -620,6 +748,11 @@ export default function ForgePortal({
 
       </main>
 
+      {/* Google AdSense footer widget slot */}
+      <div className="max-w-7xl mx-auto px-6">
+        <GoogleAdSenseUnit placement="footer" />
+      </div>
+
       {/* FOOTER */}
       <footer className="shrink-0 bg-[#070611]/60 backdrop-blur-xl border-t border-white/[0.06] mt-16 p-6 md:p-8 relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -809,7 +942,7 @@ export default function ForgePortal({
               <div className="flex items-center gap-2 pt-1 font-mono text-[9px]">
                 <button
                   onClick={() => {
-                    localStorage.setItem("mythics_forge_cookie_choice", "accepted");
+                    safeStorage.setItem("mythics_forge_cookie_choice", "accepted");
                     setShowConsentBanner(false);
                   }}
                   className="flex-1 py-2 bg-gradient-to-r from-indigo-650 to-purple-650 hover:from-purple-650 hover:to-indigo-650 text-white font-extrabold uppercase rounded-lg transition-colors cursor-pointer bg-indigo-600 text-center"
@@ -818,7 +951,7 @@ export default function ForgePortal({
                 </button>
                 <button
                   onClick={() => {
-                    localStorage.setItem("mythics_forge_cookie_choice", "declined");
+                    safeStorage.setItem("mythics_forge_cookie_choice", "declined");
                     setShowConsentBanner(false);
                   }}
                   className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white rounded-lg border border-white/10 transition-colors cursor-pointer text-center"
@@ -888,6 +1021,138 @@ export default function ForgePortal({
           </div>
         )}
       </AnimatePresence>
+
+      {/* HEPHAESTUS INTELLIGENT AI SYSTEM COMPANION */}
+      <div id="hephaestus-ai-module" className="fixed bottom-6 right-6 z-40 font-sans">
+        <AnimatePresence>
+          {isChatOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              transition={{ type: "spring", stiffness: 260, damping: 25 }}
+              className="absolute bottom-16 right-0 w-80 sm:w-96 h-[500px] bg-[#0A0918]/95 backdrop-blur-xl border border-indigo-500/25 rounded-2xl flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden"
+            >
+              {/* Header Box */}
+              <div className="p-4 bg-gradient-to-r from-indigo-950/80 via-purple-950/50 to-[#0A0918] border-b border-indigo-500/10 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-[#F9AB00] flex items-center justify-center text-black font-bold text-xs select-none shadow-[0_0_15px_rgba(249,171,0,0.3)]">
+                      H
+                    </div>
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0A0918] rounded-full animate-pulse"></span>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono uppercase tracking-widest text-[#FFD1B3] font-black flex items-center gap-1">
+                      <span>Hephaestus AI</span>
+                      <Sparkles className="w-3 h-3 text-[#F9AB00]" />
+                    </h4>
+                    <span className="text-[9px] text-slate-400 font-mono tracking-wider">FORGE COMMANDER</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsChatOpen(false)}
+                  className="w-7 h-7 flex items-center justify-center bg-white/5 hover:bg-white/10 hover:text-white rounded-lg border border-white/10 text-slate-400 transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Chat Message Box */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs scrollbar-thin scrollbar-thumb-white/5">
+                {chatHistory.map((msg, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
+                  >
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                      msg.role === "user" 
+                        ? "bg-indigo-650 text-white font-mono text-[9px] bg-indigo-600" 
+                        : "bg-amber-500/10 border border-[#F9AB00]/20 text-[#F9AB00]"
+                    }`}>
+                      {msg.role === "user" ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
+                    </div>
+                    <div className={`max-w-[80%] rounded-xl px-3 py-2.5 leading-relaxed relative ${
+                      msg.role === "user"
+                        ? "bg-indigo-650/40 text-slate-250 border border-indigo-500/15"
+                        : "bg-slate-900/60 text-slate-350 border border-white/5"
+                    }`}>
+                      {/* Standard text split with light dynamic custom paragraph rendering */}
+                      {msg.content.split("\n").map((line, lIdx) => (
+                        <p key={lIdx} className={line.trim() === "" ? "h-2" : "mb-1 text-slate-250"}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                {isChatLoading && (
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-[#F9AB00]/20 text-[#F9AB00] flex items-center justify-center animate-spin">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="bg-slate-900/60 border border-white/5 rounded-xl px-3 py-2.5 flex items-center gap-1 text-slate-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]"></span>
+                      <span className="text-[9px] font-mono uppercase tracking-wider ml-1 text-amber-500/50">Stoking the forge...</span>
+                    </div>
+                  </div>
+                )}
+
+                {chatError && (
+                  <div className="p-3 bg-red-950/20 border border-red-500/10 text-red-300 text-[10px] rounded-lg font-mono">
+                    ⚠️ {chatError}
+                  </div>
+                )}
+              </div>
+
+              {/* Input Action Form */}
+              <form 
+                onSubmit={handleSendMessage} 
+                className="p-3 bg-black/40 border-t border-indigo-500/10 flex items-center gap-2"
+              >
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask about templates, Blogger, AdSense..."
+                  disabled={isChatLoading}
+                  className="flex-1 bg-slate-950/80 border border-white/10 focus:border-[#F9AB00]/40 rounded-xl px-3.5 py-2 text-xs text-slate-200 outline-none placeholder:text-slate-500"
+                />
+                <button
+                  type="submit"
+                  disabled={!chatInput.trim() || isChatLoading}
+                  className="w-8 h-8 rounded-xl bg-gradient-to-r from-indigo-650 to-purple-650 hover:from-[#F9AB00] hover:to-amber-500 hover:text-black flex items-center justify-center text-white font-mono cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-indigo-600 shadow-[0_0_15px_rgba(99,102,241,0.25)] hover:shadow-[0_0_15px_rgba(249,171,0,0.3)] duration-300"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Floating Action FAB */}
+        <motion.button
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          animate={isChatOpen ? { rotate: [0, 90, 0] } : { scale: [1, 1.05, 1] }}
+          transition={isChatOpen ? { duration: 0.3 } : { duration: 2, repeat: Infinity }}
+          className="w-12 h-12 bg-gradient-to-tr from-indigo-610 via-[#F9AB00] to-pink-610 rounded-full flex items-center justify-center text-white shadow-[0_4px_25px_rgba(249,171,0,0.45)] cursor-pointer hover:scale-105 active:scale-95 transition-transform z-50 bg-indigo-600 relative overflow-hidden group"
+          id="assistant-launcher-btn"
+        >
+          {/* Pulsing light ring */}
+          <div className="absolute inset-0 bg-[#F9AB00]/40 blur-lg rounded-full opacity-60 group-hover:opacity-100 transition duration-300 scale-125 z-0"></div>
+          
+          <div className="relative z-10">
+            {isChatOpen ? (
+              <X className="w-5 h-5 text-slate-100" />
+            ) : (
+              <MessageSquareCode className="w-5 h-5 text-slate-950" />
+            )}
+          </div>
+        </motion.button>
+      </div>
     </div>
   );
 }

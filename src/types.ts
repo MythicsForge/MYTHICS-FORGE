@@ -61,4 +61,8 @@ export interface StudioSettings {
   redditUrl?: string;
   linkedinUrl?: string;
   instagramUrl?: string;
+  adsenseClientId?: string;
+  adsenseSlotId?: string;
+  adsenseEnabled?: boolean;
+  adsensePlacement?: "header" | "footer" | "sidebar" | "none";
 }

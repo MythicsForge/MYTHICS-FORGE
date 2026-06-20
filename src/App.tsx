@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Project, ChroniclePost, StudioSettings } from "./types";
 import { INITIAL_PROJECTS, INITIAL_CHRONICLES } from "./data";
 import ForgePortal from "./components/ForgePortal";
+import { safeStorage } from "./safeStorage";
 // @ts-ignore
 import shieldImage from "./assets/images/regenerated_image_1781023425937.png";
 // @ts-ignore
@@ -26,7 +27,11 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   gumroadUrl: "https://mythicsforge.gumroad.com",
   redditUrl: "https://www.reddit.com/user/MythicsForge",
   linkedinUrl: "https://www.linkedin.com/company/mythics-forge",
-  instagramUrl: "https://www.instagram.com/mythics_forge"
+  instagramUrl: "https://www.instagram.com/mythics_forge",
+  adsenseClientId: "",
+  adsenseSlotId: "",
+  adsenseEnabled: false,
+  adsensePlacement: "footer"
 };
 
 function migrateStudioSettings(settings: StudioSettings): StudioSettings {
@@ -49,6 +54,18 @@ function migrateStudioSettings(settings: StudioSettings): StudioSettings {
   if (!updated.instagramUrl || updated.instagramUrl === "https://instagram.com/mythics-forge") {
     updated.instagramUrl = "https://www.instagram.com/mythics_forge";
   }
+  if (updated.adsenseEnabled === undefined) {
+    updated.adsenseEnabled = false;
+  }
+  if (updated.adsenseClientId === undefined) {
+    updated.adsenseClientId = "";
+  }
+  if (updated.adsenseSlotId === undefined) {
+    updated.adsenseSlotId = "";
+  }
+  if (updated.adsensePlacement === undefined) {
+    updated.adsensePlacement = "footer";
+  }
   return updated;
 }
 
@@ -56,10 +73,10 @@ export default function App() {
   const [projects, setProjects] = useState<Project[]>(() => {
     try {
       if (INITIAL_PROJECTS.length === 0) {
-        localStorage.removeItem("mythics_forge_projects_v2");
+        safeStorage.removeItem("mythics_forge_projects_v2");
         return [];
       }
-      const saved = localStorage.getItem("mythics_forge_projects_v2");
+      const saved = safeStorage.getItem("mythics_forge_projects_v2");
       if (saved) {
         const parsed = JSON.parse(saved) as Project[];
         // Filter out any projects that are no longer in our base code definition
@@ -89,10 +106,10 @@ export default function App() {
   const [chronicles, setChronicles] = useState<ChroniclePost[]>(() => {
     try {
       if (INITIAL_CHRONICLES.length === 0) {
-        localStorage.removeItem("mythics_forge_chronicles");
+        safeStorage.removeItem("mythics_forge_chronicles");
         return [];
       }
-      const saved = localStorage.getItem("mythics_forge_chronicles");
+      const saved = safeStorage.getItem("mythics_forge_chronicles");
       if (saved) {
         const parsed = JSON.parse(saved) as ChroniclePost[];
         // Filter out deleted posts present in local storage
@@ -116,7 +133,7 @@ export default function App() {
 
   const [studioSettings, setStudioSettings] = useState<StudioSettings>(() => {
     try {
-      const saved = localStorage.getItem("mythics_forge_studio_settings");
+      const saved = safeStorage.getItem("mythics_forge_studio_settings");
       if (saved) {
         const parsed = JSON.parse(saved) as StudioSettings;
         parsed.logoImageUrl = logoSvg;
@@ -189,7 +206,7 @@ export default function App() {
   // Persist files locally when edited (Client fallback caching)
   useEffect(() => {
     try {
-      localStorage.setItem("mythics_forge_projects_v2", JSON.stringify(projects));
+      safeStorage.setItem("mythics_forge_projects_v2", JSON.stringify(projects));
     } catch (e) {
       console.error("Failed to write to local ledger store:", e);
     }
@@ -197,7 +214,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("mythics_forge_chronicles", JSON.stringify(chronicles));
+      safeStorage.setItem("mythics_forge_chronicles", JSON.stringify(chronicles));
     } catch (e) {
       console.error("Failed to write to local chronicles store:", e);
     }
@@ -205,7 +222,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem("mythics_forge_studio_settings", JSON.stringify(studioSettings));
+      safeStorage.setItem("mythics_forge_studio_settings", JSON.stringify(studioSettings));
     } catch (e) {
       console.error("Failed to write to local studio settings:", e);
     }
@@ -243,9 +260,9 @@ export default function App() {
       setProjects(INITIAL_PROJECTS);
       setChronicles(INITIAL_CHRONICLES);
       setStudioSettings(DEFAULT_STUDIO_SETTINGS);
-      localStorage.removeItem("mythics_forge_projects_v2");
-      localStorage.removeItem("mythics_forge_chronicles");
-      localStorage.removeItem("mythics_forge_studio_settings");
+      safeStorage.removeItem("mythics_forge_projects_v2");
+      safeStorage.removeItem("mythics_forge_chronicles");
+      safeStorage.removeItem("mythics_forge_studio_settings");
     }
   };
 

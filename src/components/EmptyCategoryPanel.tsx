@@ -9,6 +9,7 @@ import {
   CheckCircle2, Mail, Send, Copy, RefreshCw, Layers, ShieldCheck, Clock
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { safeStorage } from "../safeStorage";
 
 interface EmptyCategoryPanelProps {
   category: string;
@@ -176,7 +177,7 @@ ${senderName || "Visitor"}`;
 
   // Load local message logs
   useEffect(() => {
-    const saved = localStorage.getItem("forge_inquiry_dispatch_history");
+    const saved = safeStorage.getItem("forge_inquiry_dispatch_history");
     if (saved) {
       try {
         setLocalLogs(JSON.parse(saved));
@@ -189,7 +190,7 @@ ${senderName || "Visitor"}`;
   const saveLog = (newLog: any) => {
     const updated = [newLog, ...localLogs].slice(0, 4); // Keep last 4 logs
     setLocalLogs(updated);
-    localStorage.setItem("forge_inquiry_dispatch_history", JSON.stringify(updated));
+    safeStorage.setItem("forge_inquiry_dispatch_history", JSON.stringify(updated));
   };
 
   // Slowly shuffle and load logs over time to simulate live compilation activity

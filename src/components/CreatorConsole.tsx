@@ -7,7 +7,8 @@ import { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { 
   Terminal, ShieldCheck, Key, RefreshCw, Plus, 
   Trash2, Edit, Save, Undo2, LogOut, CheckCircle2, 
-  Download, Upload, HeartHandshake, Eye, EyeOff
+  Download, Upload, HeartHandshake, Eye, EyeOff,
+  HelpCircle, Code
 } from "lucide-react";
 import { Project, ChroniclePost, StudioSettings } from "../types";
 // @ts-ignore
@@ -36,6 +37,7 @@ export default function CreatorConsole({
 }: CreatorConsoleProps) {
   const [password, setPassword] = useState("");
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [showBloggerGuide, setShowBloggerGuide] = useState(false);
   const [errorWord, setErrorWord] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +57,11 @@ export default function CreatorConsole({
     gumroadUrl: studioSettings.gumroadUrl || "",
     redditUrl: studioSettings.redditUrl || "",
     linkedinUrl: studioSettings.linkedinUrl || "",
-    instagramUrl: studioSettings.instagramUrl || ""
+    instagramUrl: studioSettings.instagramUrl || "",
+    adsenseClientId: studioSettings.adsenseClientId || "",
+    adsenseSlotId: studioSettings.adsenseSlotId || "",
+    adsenseEnabled: studioSettings.adsenseEnabled || false,
+    adsensePlacement: studioSettings.adsensePlacement || "footer"
   });
 
   const [isDraggingLogo, setIsDraggingLogo] = useState(false);
@@ -94,7 +100,11 @@ export default function CreatorConsole({
       gumroadUrl: studioSettings.gumroadUrl || "",
       redditUrl: studioSettings.redditUrl || "",
       linkedinUrl: studioSettings.linkedinUrl || "",
-      instagramUrl: studioSettings.instagramUrl || ""
+      instagramUrl: studioSettings.instagramUrl || "",
+      adsenseClientId: studioSettings.adsenseClientId || "",
+      adsenseSlotId: studioSettings.adsenseSlotId || "",
+      adsenseEnabled: studioSettings.adsenseEnabled || false,
+      adsensePlacement: studioSettings.adsensePlacement || "footer"
     });
   }, [studioSettings]);
 
@@ -114,7 +124,11 @@ export default function CreatorConsole({
       gumroadUrl: settingsForm.gumroadUrl,
       redditUrl: settingsForm.redditUrl,
       linkedinUrl: settingsForm.linkedinUrl,
-      instagramUrl: settingsForm.instagramUrl
+      instagramUrl: settingsForm.instagramUrl,
+      adsenseClientId: settingsForm.adsenseClientId,
+      adsenseSlotId: settingsForm.adsenseSlotId,
+      adsenseEnabled: settingsForm.adsenseEnabled,
+      adsensePlacement: settingsForm.adsensePlacement as "header" | "footer" | "sidebar" | "none"
     });
     triggerAlertMessage("🔥 BRANDING & COMPANY IDENTITY METAMORPHED SUCCESSFULLY!");
   };
@@ -312,6 +326,54 @@ export default function CreatorConsole({
     triggerAlertMessage("🔥 COMBINED PROGRAM STATE (.app) EXPORTED SUCCESSFULLY!");
   };
 
+  // Fetch and download single-file Blogger bundle via robust blob triggers
+  const handleDownloadSingleFile = async () => {
+    try {
+      const response = await fetch("/api/download-singlefile");
+      if (!response.ok) {
+        throw new Error("Critical fallback: Could not retrieve compiled single-file bundle from the engine.");
+      }
+      const data = await response.text();
+      const blob = new Blob([data], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", url);
+      downloadAnchor.setAttribute("download", "mythics_forge_blogger.html");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(url);
+      triggerAlertMessage("🔥 COGNITIVE GRID METAMORPH: Blogger HTML bundle extracted successfully!");
+    } catch (error: any) {
+      console.error(error);
+      triggerAlertMessage("⛔ PIPELINE INTERRUPTED: Failed to fetch single-file dataset.");
+    }
+  };
+
+  // Fetch and download single-file Blogger XML template theme
+  const handleDownloadBloggerXML = async () => {
+    try {
+      const response = await fetch("/api/download-blogger-theme-xml");
+      if (!response.ok) {
+        throw new Error("Critical fallback: Could not retrieve compiled single-file XML Theme from the engine.");
+      }
+      const data = await response.text();
+      const blob = new Blob([data], { type: "application/xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", url);
+      downloadAnchor.setAttribute("download", "mythics_forge_blogger_theme.xml");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(url);
+      triggerAlertMessage("🔥 BLOGGER THEME MATRIX: Compliant XML Theme template downloaded successfully!");
+    } catch (error: any) {
+      console.error(error);
+      triggerAlertMessage("⛔ PIPELINE INTERRUPTED: Failed to compile Blogger XML Theme.");
+    }
+  };
+
   // Import custom .app or .json program file
   const handleImportData = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -372,6 +434,41 @@ export default function CreatorConsole({
                 Export .app Container
               </button>
 
+              <button
+                onClick={handleDownloadSingleFile}
+                id="blogger-export-btn"
+                className="px-3 py-1.5 bg-gradient-to-r from-[#FF5E13]/25 to-[#EC4899]/25 hover:from-[#FF5E13]/40 hover:to-[#EC4899]/40 border border-[#FF5E13]/40 hover:border-[#FF5E13]/65 text-[#FFD1B3] hover:text-white text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors"
+                title="Download the entire application as a single self-contained HTML file"
+              >
+                <Download className="w-3.5 h-3.5 text-[#FF5E13]" />
+                Blogger HTML Bundle
+              </button>
+
+              <button
+                onClick={handleDownloadBloggerXML}
+                id="blogger-xml-export-btn"
+                className="px-3 py-1.5 bg-gradient-to-r from-[#10B981]/25 to-[#3B82F6]/25 hover:from-[#10B981]/40 hover:to-[#3B82F6]/40 border border-[#10B981]/40 hover:border-[#10B981]/65 text-[#D1FAE5] hover:text-white text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors"
+                title="Download the completely error-proof Blogger XML Theme template"
+              >
+                <Code className="w-3.5 h-3.5 text-[#10B981]" />
+                Blogger XML Theme
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowBloggerGuide(!showBloggerGuide)}
+                id="blogger-guide-toggle-btn"
+                className={`px-3 py-1.5 border text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-all ${
+                  showBloggerGuide
+                    ? "bg-[#FF5E13]/30 border-[#FF5E13] text-white shadow-[0_0_15px_rgba(255,94,19,0.3)]"
+                    : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-slate-300"
+                }`}
+                title="Show step-by-step setup guide to fix Blogger white screens"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-[#FF5E13]" />
+                Blogger Guide
+              </button>
+
               <label className="px-3 py-1.5 bg-gradient-to-r from-[#4F46E5]/20 to-[#EC4899]/20 hover:from-[#4F46E5]/30 hover:to-[#EC4899]/30 border border-[#EC4899]/30 hover:border-[#EC4899]/55 text-slate-200 text-xs font-mono rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors">
                 <Upload className="w-3.5 h-3.5 text-[#EC4899]" />
                 Mount .app Container
@@ -424,6 +521,93 @@ export default function CreatorConsole({
         <div className="bg-red-950/20 border border-red-950 text-red-400 p-3.5 rounded-lg mb-6 text-xs font-mono flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-red-500" />
           <span>{errorWord}</span>
+        </div>
+      )}
+
+      {showBloggerGuide && (
+        <div className="bg-[#111216] border border-[#FF5E13]/30 p-6 rounded-2xl mb-8 space-y-6 shadow-2xl relative overflow-hidden transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#FF5E13]/10 to-transparent rounded-full pointer-events-none blur-xl animate-pulse"></div>
+          
+          <div className="flex items-center gap-2.5 border-b border-white/5 pb-3">
+            <HelpCircle className="w-5 h-5 text-[#FF5E13]" />
+            <h4 className="text-[#FFD1B3] text-sm font-mono uppercase tracking-wider font-bold">
+              Blogger Integration Protocol (Google AdSense Ready)
+            </h4>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
+            {/* COLUMN 1: HOSTED IFRAME METHOD (RECOMMENDED) */}
+            <div className="bg-white/[0.02] border border-white/5 p-5 rounded-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-white uppercase bg-[#FF5E13]/25 px-2.5 py-1 rounded">
+                  Method A: Clean Iframe (Highly Recommended ⭐)
+                </span>
+                <span className="text-[10px] text-emerald-400 font-mono">Zero Code Modification</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                Best for embedding pages or articles inside any blog post. Blogger's editor often strips modern React scripts. Using an iframe completely circumvents Blogger's restrictions and renders your interactive gallery perfectly!
+              </p>
+              
+              <div className="space-y-2">
+                <label className="text-[10px] text-[#FF9E66] font-mono uppercase">Your Pasteable HTML Code:</label>
+                <div className="relative">
+                  <pre className="bg-black/60 p-3 rounded-lg text-[10px] text-slate-300 font-mono overflow-x-auto border border-white/5 leading-relaxed max-h-[140px]">
+{`<div style="width:100%; height:820px; overflow:hidden; border:none; border-radius:16px; background-color:#0d0e12; box-shadow:0 15px 40px rgba(0,0,0,0.65);">
+  <iframe 
+    src="${window.location.origin}" 
+    style="width: 100%; height: 100%; border: none; outline: none; margin: 0; padding: 0;"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+    allowfullscreen="true">
+  </iframe>
+</div>`}
+                  </pre>
+                  <button 
+                    onClick={() => {
+                      const code = `<div style="width:100%; height:820px; overflow:hidden; border:none; border-radius:16px; background-color:#0d0e12; box-shadow:0 15px 40px rgba(0,0,0,0.65);">\n  <iframe \n    src="${window.location.origin}" \n    style="width: 100%; height: 100%; border: none; outline: none; margin: 0; padding: 0;"\n    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"\n    allowfullscreen="true">\n  </iframe>\n</div>`;
+                      navigator.clipboard.writeText(code);
+                      triggerAlertMessage("📋 HTML iframe code copied to clipboard!");
+                    }}
+                    className="absolute right-2 bottom-2 px-2 py-0.5 bg-white/5 hover:bg-white/15 text-[9px] font-mono text-slate-200 border border-white/10 rounded active:scale-95 transition-all"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              <ol className="text-[11px] text-slate-400 space-y-1.5 list-decimal list-inside leading-relaxed block pl-1">
+                <li>Create/edit a Post or Page in Blogger.</li>
+                <li>Switch from <strong>Compose View</strong> to <strong>HTML View</strong> (top-left pencil/brackets icon).</li>
+                <li>Paste the copied iframe snippet and Publish!</li>
+              </ol>
+            </div>
+
+            {/* COLUMN 2: CUSTOM THEME UPLOAD (XML) */}
+            <div className="bg-white/[0.02] border border-white/5 p-5 rounded-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-white uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded">
+                  Method B: Full Blog Theme (Full Domain Customization)
+                </span>
+                <span className="text-[10px] text-amber-400 font-mono">Expert</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                Best if you want your entire Blogger domain (e.g., <code>yourblog.blogspot.com</code>) to load Mythics Forge as its main homepage. This creates a fully custom stand-alone website portal.
+              </p>
+
+              <div className="bg-[#161d2d]/30 border border-[#3b82f6]/20 p-3.5 rounded-lg space-y-2">
+                <h5 className="text-[11px] font-mono font-bold text-[#93c5fd]">Why the download template prevents white screens:</h5>
+                <p className="text-[10px] text-slate-400 leading-normal">
+                  Our custom build-compiler transforms the standard Vite single file bundle into an XML package, automatically wrapping all scripts in <code>{"//<![CDATA["}</code> tags and declaring Blogger layouts so the theme parses with 100% compliance.
+                </p>
+              </div>
+
+              <ol className="text-[11px] text-slate-400 space-y-2 list-decimal list-inside leading-relaxed block pl-1">
+                <li>Click the <strong>Blogger XML Theme</strong> button above to download the template file.</li>
+                <li>In Blogger dashboard, go to <strong>Theme</strong> menu in the side drawer.</li>
+                <li>Click the dropdown arrow next to <strong>Customize</strong> and select <strong>Edit HTML</strong>.</li>
+                <li>Delete everything inside, paste the contents of your downloaded XML theme file, and hit save!</li>
+              </ol>
+            </div>
+          </div>
         </div>
       )}
 
@@ -726,6 +910,72 @@ export default function CreatorConsole({
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Google AdSense monetization center */}
+                <div id="blogger-adsense-monetization-center" className="bg-[#181924]/40 border border-[#F9AB00]/20 p-5 rounded-2xl space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#F9AB00] animate-pulse"></div>
+                      <h4 className="text-[#FFD1B3] text-xs font-mono uppercase tracking-wider font-bold">
+                        Google AdSense Integration Center
+                      </h4>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        checked={settingsForm.adsenseEnabled}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, adsenseEnabled: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#F9AB00]/40 peer-checked:after:bg-[#F9AB00]"></div>
+                      <span className="ml-2 text-[10px] font-mono text-slate-300 uppercase">
+                        {settingsForm.adsenseEnabled ? "Connected" : "Disabled"}
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                    Turn on the switch to connect your Google AdSense account. Your ad publisher scripts will automatically compile inside your custom exported Blogger XML template in full compliance with Google Webmaster policies.
+                  </p>
+
+                  {settingsForm.adsenseEnabled && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                      <div>
+                        <label className="block text-[9px] text-[#F9AB00] font-mono uppercase mb-1">AdSense Publisher Client ID</label>
+                        <input
+                          type="text"
+                          value={settingsForm.adsenseClientId}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, adsenseClientId: e.target.value })}
+                          placeholder="ca-pub-1234567890123456"
+                          className="w-full bg-[#030303] border border-white/10 focus:border-[#F9AB00]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[#F9AB00] font-mono uppercase mb-1">AdSense Ad Slot ID</label>
+                        <input
+                          type="text"
+                          value={settingsForm.adsenseSlotId}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, adsenseSlotId: e.target.value })}
+                          placeholder="9876543210"
+                          className="w-full bg-[#030303] border border-white/10 focus:border-[#F9AB00]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] text-[#F9AB00] font-mono uppercase mb-1">Ad Display Placement</label>
+                        <select
+                          value={settingsForm.adsensePlacement}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, adsensePlacement: e.target.value as any })}
+                          className="w-full bg-[#030303] border border-white/10 focus:border-[#F9AB00]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                        >
+                          <option value="footer">Footer Wide Banner</option>
+                          <option value="header">Top Page Banner</option>
+                          <option value="sidebar">Sidebar Widget Box</option>
+                          <option value="none">Auto Ads Only (Header Script)</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-end pt-1">
