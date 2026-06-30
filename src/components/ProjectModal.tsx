@@ -68,27 +68,27 @@ const parseMarkdown = (text: string, accentHex: string = "#EC4899") => {
 
 export default function ProjectModal({ project, onClose, accentHex = "#EC4899" }: ProjectModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
         transition={{ type: "spring", duration: 0.5 }}
         id={`modal-${project.id}`}
-        className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden bg-[#0D0B1C] border border-white/[0.08] rounded-[2rem] shadow-2xl flex flex-col"
+        className="relative w-full max-w-4xl max-h-[92vh] sm:max-h-[85vh] overflow-hidden bg-[#0D0B1C] border border-white/[0.08] rounded-2xl sm:rounded-[2rem] shadow-2xl flex flex-col"
       >
         {/* Close Button Pin */}
         <button
           onClick={onClose}
           id="close-modal-btn"
           aria-label="Close details"
-          className="absolute top-4 right-4 z-10 p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors cursor-pointer"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-1.5 sm:p-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors cursor-pointer"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
         {/* Hero Banner Area */}
-        <div className="relative h-64 md:h-80 shrink-0 overflow-hidden border-b border-white/[0.06]">
+        <div className="relative h-48 sm:h-64 md:h-80 shrink-0 overflow-hidden border-b border-white/[0.06]">
           <img
             src={project.bannerImage}
             alt={project.title}
@@ -99,14 +99,14 @@ export default function ProjectModal({ project, onClose, accentHex = "#EC4899" }
           <div className="absolute inset-0 bg-gradient-to-t from-[#0D0B1C] via-transparent to-transparent"></div>
 
           {/* Banner Details Overlay */}
-          <div className="absolute bottom-6 left-6 right-6">
-            <span className="px-3.5 py-1.5 text-[10px] font-mono uppercase tracking-widest rounded-lg border animate-pulse" style={{ backgroundColor: `${accentHex}10`, borderColor: `${accentHex}30`, color: accentHex }}>
+          <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+            <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[9px] sm:text-[10px] font-mono uppercase tracking-widest rounded-lg border animate-pulse" style={{ backgroundColor: `${accentHex}10`, borderColor: `${accentHex}30`, color: accentHex }}>
               {project.category}
             </span>
-            <h2 className="text-2xl md:text-3xl font-serif font-black text-white mt-4 uppercase tracking-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-black text-white mt-3 sm:mt-4 uppercase tracking-tight">
               {project.title}
             </h2>
-            <p className="text-white/60 text-xs md:text-sm mt-2 font-sans font-light max-w-2xl">
+            <p className="text-white/60 text-[11px] sm:text-xs md:text-sm mt-1.5 sm:mt-2 font-sans font-light max-w-2xl">
               {project.subtitle}
             </p>
           </div>

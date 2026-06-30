@@ -48,31 +48,31 @@ export default function LegalAndSupportModal({ activeTab, onClose }: LegalAndSup
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
       <div 
         id="legal-support-panel"
-        className="bg-[#0B0A16] border border-white/[0.08] rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative"
+        className="bg-[#0B0A16] border border-white/[0.08] rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[92vh] sm:max-h-[85vh] overflow-hidden flex flex-col shadow-2xl relative"
       >
         {/* Floating gradient lights */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
         {/* Modal Top Header */}
-        <div className="p-6 border-b border-white/[0.06] bg-gradient-to-r from-indigo-950/20 to-purple-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+        <div className="p-4 sm:p-6 border-b border-white/[0.06] bg-gradient-to-r from-indigo-950/20 to-purple-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
           <div>
             <span className="text-[9px] text-[#EC4899] font-mono uppercase tracking-[0.25em] font-extrabold flex items-center gap-1">
               <Sparkles className="w-3 h-3" /> OFFICIAL COMPLIANCE PORTAL
             </span>
-            <h4 className="font-serif text-white font-extrabold text-lg mt-1 uppercase tracking-wide">
+            <h4 className="font-serif text-white font-extrabold text-sm sm:text-lg mt-1 uppercase tracking-wide">
               TRUST, PRIVACY & COMMUNICATION
             </h4>
           </div>
           
           {/* Tabs selector */}
-          <div className="flex gap-1.5 bg-black/45 p-1 rounded-xl border border-white/5">
+          <div className="flex flex-wrap sm:flex-nowrap gap-1.5 bg-black/45 p-1 rounded-xl border border-white/5 justify-center sm:justify-start">
             <button
               onClick={() => { setCurrentTab("privacy"); setSubmissionToken(null); }}
-              className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] uppercase font-mono font-bold transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
                 currentTab === "privacy" ? "bg-indigo-650 text-white bg-indigo-600" : "text-white/40 hover:text-white"
               }`}
             >
@@ -80,7 +80,7 @@ export default function LegalAndSupportModal({ activeTab, onClose }: LegalAndSup
             </button>
             <button
               onClick={() => { setCurrentTab("terms"); setSubmissionToken(null); }}
-              className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] uppercase font-mono font-bold transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
                 currentTab === "terms" ? "bg-indigo-650 text-white bg-indigo-600" : "text-white/40 hover:text-white"
               }`}
             >
@@ -88,7 +88,7 @@ export default function LegalAndSupportModal({ activeTab, onClose }: LegalAndSup
             </button>
             <button
               onClick={() => { setCurrentTab("contact"); }}
-              className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] uppercase font-mono font-bold transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer ${
                 currentTab === "contact" ? "bg-indigo-650 text-white bg-indigo-600" : "text-white/40 hover:text-white"
               }`}
             >
@@ -98,7 +98,7 @@ export default function LegalAndSupportModal({ activeTab, onClose }: LegalAndSup
         </div>
 
         {/* Scrollable Content Bay */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 relative z-10 text-white/70 text-xs md:text-sm leading-relaxed font-sans font-light">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 relative z-10 text-white/70 text-xs md:text-sm leading-relaxed font-sans font-light">
           
           {/* TAB 1: PRIVACY POLICY */}
           {currentTab === "privacy" && (

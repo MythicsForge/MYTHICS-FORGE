@@ -11,14 +11,14 @@ import {
 import { 
   Flame, Cpu, Globe, Disc, Shield, Clock, BookOpen, 
   Search, ArrowRight, Github, ExternalLink, SlidersHorizontal, Sparkles, Terminal,
-  MessageSquareCode, Send, User, Bot, X, Key
+  MessageSquareCode, Send, User, Bot, X, Key, Palette, Check
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
-import CreatorConsole from "./CreatorConsole";
 import EmptyCategoryPanel from "./EmptyCategoryPanel";
 import LegalAndSupportModal from "./LegalAndSupportModal";
 import { motion, AnimatePresence } from "motion/react";
 import { safeStorage } from "../safeStorage";
+import { THEME_ACCENTS, PRESET_UI_VARIATIONS } from "../theme";
 
 interface ForgePortalProps {
   projects: Project[];
@@ -29,79 +29,6 @@ interface ForgePortalProps {
   setStudioSettings: (settings: StudioSettings) => void;
   onReset: () => void;
 }
-
-export const THEME_ACCENTS = {
-  orange: {
-    primaryHex: "#FF5E13",
-    accentHex: "#F9AB00",
-    glowColor: "rgba(249, 171, 0, 0.35)",
-    bannerGlow: "shadow-[0_0_40px_rgba(249,171,0,0.12)]",
-    textClass: "text-[#F9AB00]",
-    textMuted: "text-[#FF5E13]",
-    borderClass: "border-[#F9AB00]/20",
-    borderFocusClass: "focus:border-[#FF5E13]/55",
-    accentBorder: "border-[#F9AB00]/40",
-    bgClass: "from-amber-500/5 via-[#F9AB00]/10 to-amber-500/5",
-    btnGrad: "from-amber-500 to-[#FF5E13]",
-    btnShadow: "shadow-[0_0_15px_rgba(249,171,0,0.3)]",
-  },
-  blue: {
-    primaryHex: "#0284C7",
-    accentHex: "#38BDF8",
-    glowColor: "rgba(56, 189, 248, 0.35)",
-    bannerGlow: "shadow-[0_0_40px_rgba(52,152,219,0.12)]",
-    textClass: "text-[#38BDF8]",
-    textMuted: "text-[#0284C7]",
-    borderClass: "border-[#38BDF8]/20",
-    borderFocusClass: "focus:border-[#0284C7]/55",
-    accentBorder: "border-[#38BDF8]/40",
-    bgClass: "from-sky-500/5 via-[#38BDF8]/10 to-sky-500/5",
-    btnGrad: "from-sky-600 to-[#0284C7]",
-    btnShadow: "shadow-[0_0_15px_rgba(56,189,248,0.3)]",
-  },
-  green: {
-    primaryHex: "#059669",
-    accentHex: "#34D399",
-    glowColor: "rgba(52, 211, 153, 0.35)",
-    bannerGlow: "shadow-[0_0_40px_rgba(46,204,113,0.12)]",
-    textClass: "text-[#34D399]",
-    textMuted: "text-[#059669]",
-    borderClass: "border-[#34D399]/20",
-    borderFocusClass: "focus:border-[#059669]/55",
-    accentBorder: "border-[#34D399]/40",
-    bgClass: "from-emerald-500/5 via-[#34D399]/10 to-emerald-500/5",
-    btnGrad: "from-emerald-600 to-[#059669]",
-    btnShadow: "shadow-[0_0_15px_rgba(52,211,153,0.3)]",
-  },
-  purple: {
-    primaryHex: "#7C3AED",
-    accentHex: "#A78BFA",
-    glowColor: "rgba(167, 139, 250, 0.35)",
-    bannerGlow: "shadow-[0_0_40px_rgba(155,89,182,0.12)]",
-    textClass: "text-[#A78BFA]",
-    textMuted: "text-[#7C3AED]",
-    borderClass: "border-[#A78BFA]/20",
-    borderFocusClass: "focus:border-[#7C3AED]/55",
-    accentBorder: "border-[#A78BFA]/40",
-    bgClass: "from-violet-500/5 via-[#A78BFA]/10 to-violet-500/5",
-    btnGrad: "from-violet-600 to-[#7C3AED]",
-    btnShadow: "shadow-[0_0_15px_rgba(167,139,250,0.3)]",
-  },
-  red: {
-    primaryHex: "#DC2626",
-    accentHex: "#F87171",
-    glowColor: "rgba(248, 113, 113, 0.35)",
-    bannerGlow: "shadow-[0_0_40px_rgba(231,76,60,0.12)]",
-    textClass: "text-[#F87171]",
-    textMuted: "text-[#DC2626]",
-    borderClass: "border-[#F87171]/20",
-    borderFocusClass: "focus:border-[#DC2626]/55",
-    accentBorder: "border-[#F87171]/40",
-    bgClass: "from-rose-500/5 via-[#F87171]/10 to-rose-500/5",
-    btnGrad: "from-rose-600 to-[#DC2626]",
-    btnShadow: "shadow-[0_0_15px_rgba(248,113,113,0.3)]",
-  }
-};
 
 export default function ForgePortal({ 
   projects, 
@@ -115,6 +42,7 @@ export default function ForgePortal({
   // Theme Config Selection
   const activePreset = studioSettings.accentPreset || "orange";
   const activeAccent = THEME_ACCENTS[activePreset as keyof typeof THEME_ACCENTS] || THEME_ACCENTS.orange;
+  const activeUI = PRESET_UI_VARIATIONS[activePreset as keyof typeof PRESET_UI_VARIATIONS] || PRESET_UI_VARIATIONS.orange;
 
   // Navigation & Filtering
   const [selectedCategory, setSelectedCategory] = useState<string>("All Works");
@@ -137,8 +65,68 @@ export default function ForgePortal({
   const featuredProjects = projects.filter(p => p.isFeatured);
   const [featuredIdx, setFeaturedIdx] = useState(0);
 
-  // Controls drawer consoles
-  const [showConsole, setShowConsole] = useState(false);
+  // Startup Failure Overlay States
+  const [isSystemFixed, setIsSystemFixed] = useState(() => {
+    try {
+      return safeStorage.getItem("mythics_forge_fixed") === "true";
+    } catch {
+      return false;
+    }
+  });
+  const [isFixing, setIsFixing] = useState(false);
+  const [fixProgress, setFixProgress] = useState(0);
+  const [fixingStep, setFixingStep] = useState("");
+
+  const handleFixSystem = () => {
+    if (isFixing) return;
+    setIsFixing(true);
+    setFixProgress(0);
+    setFixingStep("Booting fallback firmware...");
+
+    const interval = setInterval(() => {
+      setFixProgress((prev) => {
+        const next = prev + Math.floor(Math.random() * 8) + 4;
+        if (next >= 100) {
+          clearInterval(interval);
+          setFixingStep("System integrity verified. Preparing to mount Hephaestus UI...");
+          setTimeout(() => {
+            setIsSystemFixed(true);
+            try {
+              safeStorage.setItem("mythics_forge_fixed", "true");
+            } catch (e) {
+              console.error(e);
+            }
+          }, 1200);
+          return 100;
+        }
+
+        // Update step text based on progress thresholds
+        if (next < 25) {
+          setFixingStep("Initializing backup hypervisor and allocating virtual RAM...");
+        } else if (next < 50) {
+          setFixingStep("Purging plasma chambers and recalibrating magnetic locks (35%)...");
+        } else if (next < 75) {
+          setFixingStep("Rebuilding dynamic portfolio index and syncing server files...");
+        } else if (next < 95) {
+          setFixingStep("Stabilizing Swiss typography and loading high-contrast styling presets...");
+        } else {
+          setFixingStep("Reconstructing graphics framebuffers and testing scanlines...");
+        }
+
+        return next;
+      });
+    }, 150);
+  };
+
+  // Floating Theme Switcher State
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+
+  const handleSelectPreset = (preset: string) => {
+    setStudioSettings({
+      ...studioSettings,
+      accentPreset: preset as any
+    });
+  };
 
   // Legal Trust portal & cookie preferences trackers (Google AdSense compliance guidelines)
   const [activeLegalTab, setActiveLegalTab] = useState<"privacy" | "terms" | "contact" | null>(null);
@@ -428,7 +416,21 @@ Deployment Guidance for Blogger:
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white bg-[#030209] overflow-x-hidden pt-20">
+    <div className={`min-h-screen relative flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white ${activeUI.containerBg} overflow-x-hidden pt-20 transition-colors duration-500`}>
+      {/* Dynamic scanline layer for cybernetic preset */}
+      {activeUI.scanlines && (
+        <div className="fixed inset-0 pointer-events-none z-50 bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.22)_50%)] bg-[size:100%_4px] opacity-20 pointer-events-none"></div>
+      )}
+
+      {/* Blueprint background grid matching the theme's core accent color */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-20 z-0 transition-opacity duration-500" 
+        style={{
+          backgroundImage: `linear-gradient(${activeAccent.accentHex}0a 1px, transparent 1px), linear-gradient(90deg, ${activeAccent.accentHex}0a 1px, transparent 1px)`,
+          backgroundSize: "45px 45px"
+        }}
+      />
+
       {/* Outcrowd and CosmoQ inspired premium space glowing glass gradients */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Glows */}
@@ -468,65 +470,58 @@ Deployment Guidance for Blogger:
 
       {/* Centered Floating Glass Navigation Capsule - CosmoQ Style */}
       <nav 
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-2xl px-4 py-2 md:py-2.5 rounded-full border backdrop-blur-xl transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.7)] ${
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[94%] xs:w-[92%] max-w-2xl px-3 sm:px-4 py-2 rounded-full border backdrop-blur-xl transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.7)] ${
           scrollY > 40 
             ? "bg-zinc-950/85 border-white/10" 
             : "bg-[#0A0918]/40 border-white/5"
         }`}
       >
-        <div className="flex items-center justify-between gap-1.5 md:gap-3">
+        <div className="flex items-center justify-between gap-1 sm:gap-3">
           {/* Left: Floating Brand Tag */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             {studioSettings.logoImageUrl ? (
               <img 
                 src={studioSettings.logoImageUrl} 
                 alt="Logo" 
-                className="w-5 h-5 rounded object-contain shrink-0" 
+                className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded object-contain shrink-0" 
                 referrerPolicy="no-referrer"
               />
             ) : (
               <span 
-                className="w-2 h-2 rounded-full animate-pulse shrink-0" 
+                className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" 
                 style={{ backgroundColor: activeAccent.accentHex, boxShadow: `0 0 10px ${activeAccent.accentHex}` }}
               />
             )}
-            <span className="text-[10px] sm:text-xs font-mono font-bold text-white uppercase tracking-wider select-none whitespace-nowrap flex items-center gap-1">
-              <span>{studioSettings.logoText || "Mythics Forge"}</span>
-              <span className="opacity-40">// STUDIO</span>
+            <span className="text-[10px] sm:text-xs font-mono font-bold text-white uppercase tracking-wider select-none flex items-center gap-1 min-w-0">
+              <span className="truncate max-w-[80px] sm:max-w-[150px] md:max-w-none">{studioSettings.logoText || "Mythics Forge"}</span>
+              <span className="opacity-40 hidden sm:inline-block shrink-0">// STUDIO</span>
             </span>
           </div>
 
-          {/* Center: Scroll Options */}
-          <div className="flex items-center gap-1 sm:gap-2.5 text-[9px] sm:text-[10px] font-mono tracking-widest uppercase font-bold text-white/50">
+          {/* Center: Scroll Options - hidden on super small screens to protect width layout */}
+          <div className="hidden xs:flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] font-mono tracking-widest uppercase font-bold text-white/50 shrink-0">
             <a 
               href="#solo-creator-collective" 
-              className="px-2 py-1.5 hover:text-white transition-colors hover:bg-white/5 rounded-lg whitespace-nowrap"
+              className="px-1.5 sm:px-2 py-1 hover:text-white transition-colors hover:bg-white/5 rounded-lg whitespace-nowrap"
             >
               Studio
             </a>
             <a 
               href="#vault-curated" 
-              className="px-2 py-1.5 hover:text-white transition-colors hover:bg-white/5 rounded-lg whitespace-nowrap"
+              className="px-1.5 sm:px-2 py-1 hover:text-white transition-colors hover:bg-white/5 rounded-lg whitespace-nowrap"
             >
               Curated
             </a>
           </div>
 
           {/* Right: Companion Trigger */}
-          <div className="flex items-center gap-1.5 font-mono">
+          <div className="flex items-center gap-1 sm:gap-1.5 font-mono shrink-0">
             <button
               onClick={() => setIsChatOpen(true)}
-              className="px-3 py-1.5 bg-white/5 border border-white/10 hover:border-white/25 hover:bg-white/10 text-white rounded-full text-[9px] uppercase hover:scale-105 transition-all text-center cursor-pointer font-bold shrink-0"
+              className="px-2 sm:px-3 py-1 sm:py-1.5 bg-white/5 border border-white/10 hover:border-white/25 hover:bg-white/10 text-white rounded-full text-[9px] uppercase hover:scale-105 transition-all text-center cursor-pointer font-bold shrink-0"
               style={{ color: activeAccent.accentHex }}
             >
               Companion
-            </button>
-            <button
-              onClick={() => setShowConsole(!showConsole)}
-              className="w-7 h-7 flex items-center justify-center bg-white/5 border border-white/10 hover:border-white/20 text-white hover:bg-white/10 rounded-full cursor-pointer transition-all shrink-0"
-              title="Toggle Console UI"
-            >
-              <Terminal className="w-3.5 h-3.5" style={{ color: activeAccent.accentHex }} />
             </button>
           </div>
         </div>
@@ -588,36 +583,14 @@ Deployment Guidance for Blogger:
           </div>
         </section>
 
-        {/* Dynamic Admin console dropdown slot */}
-        <AnimatePresence>
-          {showConsole && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-              id="admin-console-drawer"
-            >
-              <CreatorConsole 
-                projects={projects}
-                setProjects={setProjects}
-                chronicles={chronicles}
-                setChronicles={setChronicles}
-                studioSettings={studioSettings}
-                setStudioSettings={setStudioSettings}
-                onReset={onReset}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+
 
         {/* Monetag top banner slot */}
         <MonetagAdUnit placement="header" />
 
         {/* 1. HERO FEATURED CAROUSEL */}
         {featuredProjects.length > 0 && (
-          <section className="relative rounded-[2.5rem] overflow-hidden bg-[#121124]/30 backdrop-blur-xl border border-white/[0.08] min-h-[460px] flex flex-col justify-end group transition-all duration-500 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.7)]">
+          <section className={`relative overflow-hidden min-h-[380px] sm:min-h-[460px] flex flex-col justify-end group transition-all duration-500 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.7)] ${activeUI.cardRadius} ${activeUI.borderStyle} ${activeUI.blurStyle}`}>
             {/* Background elements */}
             <div className="absolute inset-0">
               <img 
@@ -632,31 +605,31 @@ Deployment Guidance for Blogger:
             </div>
 
             {/* Slider Text Overlays */}
-            <div className="relative z-20 p-8 md:p-12 max-w-3xl space-y-5">
+            <div className="relative z-20 p-5 sm:p-8 md:p-12 max-w-3xl space-y-4 sm:space-y-5">
               <div className="flex items-center gap-2.5">
-                <span className="w-2, w-2 h-2 rounded-full bg-[#EC4899] animate-pulse"></span>
-                <span className="text-[10px] text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] font-mono tracking-[0.2em] font-extrabold uppercase">
+                <span className="w-2 h-2 rounded-full bg-[#EC4899] animate-pulse"></span>
+                <span className={`text-[10px] text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] ${activeUI.fontMono} tracking-[0.2em] font-extrabold uppercase`}>
                   Featured Project // {String(featuredIdx + 1).padStart(2, '0')}
                 </span>
-                <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase">
+                <span className={`text-[10px] text-white/40 ${activeUI.fontMono} tracking-widest uppercase hidden sm:inline-block`}>
                   • {featuredProjects[featuredIdx].category}
                 </span>
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-serif font-black text-white tracking-tight leading-tight uppercase">
-                {featuredProjects[featuredIdx].title}
+              <h2 className={`text-2xl sm:text-3xl md:text-5xl text-white tracking-tight leading-tight uppercase ${activeUI.fontDisplay}`}>
+                {featuredProjects[featuredIdx].title}{activeUI.decorativeTitleSuffix}
               </h2>
 
-              <p className="text-white/60 text-sm md:text-base leading-relaxed font-light">
+              <p className="text-white/60 text-xs sm:text-sm md:text-base leading-relaxed font-light">
                 {featuredProjects[featuredIdx].summary}
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-4">
+              <div className="flex flex-wrap items-center gap-4 pt-2 sm:pt-4">
                 <button
                   onClick={() => setSelectedProject(featuredProjects[featuredIdx])}
                   id="featured-details-btn"
-                  className="px-8 py-3.5 bg-gradient-to-r from-[#4F46E5] to-[#EC4899] hover:from-[#EC4899] hover:to-[#4F46E5] text-white font-bold text-xs tracking-widest uppercase rounded-full hover:scale-105 transition-all duration-300 shadow-[0_10px_25px_rgba(79,70,229,0.3)] cursor-pointer"
+                  className={`px-6 sm:px-8 py-2.5 sm:py-3.5 bg-gradient-to-r ${activeAccent.btnGrad} text-white font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:scale-105 transition-all duration-300 ${activeAccent.btnShadow} cursor-pointer ${activeUI.btnRadius}`}
                 >
                   View Case Study
                 </button>
@@ -665,7 +638,7 @@ Deployment Guidance for Blogger:
 
             {/* Slide Navigation Dots */}
             {featuredProjects.length > 1 && (
-              <div className="absolute top-8 right-8 z-20 flex gap-2.5">
+              <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-20 flex gap-2.5">
                 {featuredProjects.map((_, dotIdx) => (
                   <button
                     key={dotIdx}
@@ -681,7 +654,7 @@ Deployment Guidance for Blogger:
         )}
 
         {/* SOLO STUDIO DIRECTIVE */}
-        <section id="solo-creator-collective" className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/[0.08] p-6 md:p-8 rounded-[2rem] relative overflow-hidden backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <section id="solo-creator-collective" className={`grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 md:p-8 relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-500 ${activeUI.cardRadius} ${activeUI.borderStyle} ${activeUI.blurStyle}`}>
           {/* Subtle background flair */}
           <div className="absolute top-1/2 right-[10%] w-[180px] h-[180px] bg-[#EC4899] opacity-[0.05] rounded-full blur-[60px] pointer-events-none"></div>
           <div className="absolute top-[-50px] left-[20%] w-[150px] h-[150px] bg-[#4F46E5] opacity-[0.04] rounded-full blur-[50px] pointer-events-none"></div>
@@ -689,11 +662,11 @@ Deployment Guidance for Blogger:
           <div className="lg:col-span-7 space-y-4">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#EC4899]" />
-              <span className="text-[10px] text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] tracking-[0.25em] font-mono font-extrabold uppercase">
+              <span className={`text-[10px] text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] tracking-[0.25em] ${activeUI.fontMono} font-extrabold uppercase`}>
                 COPORTRAIT & SOLO DIRECTIVE
               </span>
             </div>
-            <h3 className="text-xl md:text-2xl font-serif font-black text-white tracking-tight uppercase leading-snug">
+            <h3 className={`text-xl md:text-2xl text-white tracking-tight uppercase leading-snug ${activeUI.fontDisplay}`}>
               Independent Operations, Elite Craftsmanship
             </h3>
             <p className="text-xs md:text-sm text-white/70 leading-relaxed font-light font-sans max-w-2xl">
@@ -757,12 +730,12 @@ Deployment Guidance for Blogger:
           <section id="vault-curated" className="space-y-8 pt-4">
             <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/[0.05] pb-6 gap-6">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-widest text-[#94A3B8]">
+                <div className={`inline-flex items-center gap-1.5 ${activeUI.fontMono} text-[9px] font-bold uppercase tracking-widest text-[#94A3B8]`}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeAccent.accentHex }} />
                   CURATED ARCHIVE REGISTRY
                 </div>
-                <h3 className="text-xl md:text-2xl font-serif font-black text-white tracking-tight uppercase leading-none">
-                  Legendary Fabrications
+                <h3 className={`text-xl md:text-2xl text-white tracking-tight uppercase leading-none ${activeUI.fontDisplay}`}>
+                  Legendary Fabrications{activeUI.decorativeTitleSuffix}
                 </h3>
                 <p className="text-xs text-white/40 font-sans tracking-wide font-light max-w-xl">
                   Query and examine active digital code matrices, interactive graphics libraries, and spatial utilities engineered by Hephaestus.
@@ -770,14 +743,14 @@ Deployment Guidance for Blogger:
               </div>
 
               {/* Search Input bar */}
-              <div className="relative max-w-sm w-full font-mono">
+              <div className={`relative max-w-sm w-full ${activeUI.fontMono}`}>
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                 <input
                   type="text"
                   placeholder="Query relics or tags..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/[0.01] border border-white/[0.07] focus:border-white/20 focus:bg-white/[0.04] rounded-full pl-10 pr-4 py-2.5 text-xs text-white outline-none placeholder:text-white/20 transition-all font-sans backdrop-blur-md"
+                  className={`w-full bg-white/[0.01] border border-white/[0.07] focus:border-white/20 focus:bg-white/[0.04] pl-10 pr-4 py-2.5 text-xs text-white outline-none placeholder:text-white/20 transition-all font-sans backdrop-blur-md ${activeUI.btnRadius}`}
                 />
               </div>
             </div>
@@ -790,7 +763,7 @@ Deployment Guidance for Blogger:
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className="px-4.5 py-2 border rounded-full text-[9px] uppercase tracking-widest font-bold font-mono transition-all duration-300 flex items-center gap-2 cursor-pointer backdrop-blur-md"
+                    className={`px-4.5 py-2 border text-[9px] uppercase tracking-widest font-bold ${activeUI.fontMono} transition-all duration-300 flex items-center gap-2 cursor-pointer backdrop-blur-md ${activeUI.btnRadius}`}
                     style={{
                       backgroundColor: active ? `${activeAccent.accentHex}12` : "rgba(255, 255, 255, 0.01)",
                       borderColor: active ? activeAccent.accentHex : "rgba(255, 255, 255, 0.06)",
@@ -813,7 +786,7 @@ Deployment Guidance for Blogger:
                     key={proj.id}
                     layoutId={`project-card-${proj.id}`}
                     onClick={() => setSelectedProject(proj)}
-                    className="group relative bg-[#070611]/45 border border-white/[0.05] p-5 rounded-[2.2rem] transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer h-full hover:bg-[#0B0A1C]/55 backdrop-blur-md"
+                    className={`group relative transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer h-full hover:bg-white/[0.02] ${activeUI.cardRadius} ${activeUI.borderStyle} ${activeUI.blurStyle} p-5`}
                     whileHover={{
                       y: -5,
                       borderColor: activeAccent.accentHex,
@@ -822,7 +795,7 @@ Deployment Guidance for Blogger:
                   >
                     <div className="space-y-4">
                       {/* Cover photo slot */}
-                      <div className="aspect-[16/9] w-full overflow-hidden rounded-[1.7rem] bg-black relative border border-white/[0.04]">
+                      <div className={`aspect-[16/9] w-full overflow-hidden bg-black relative border border-white/[0.04] ${activeUI.cardInnerRadius}`}>
                         <img
                           src={proj.image}
                           alt={proj.title}
@@ -830,13 +803,13 @@ Deployment Guidance for Blogger:
                           className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 brightness-[0.7] group-hover:brightness-[0.8]"
                         />
                         {/* Interactive metadata badge overlay */}
-                        <span className="absolute top-3 left-3 px-3 py-1 bg-black/80 backdrop-blur-md border border-white/5 text-[9px] font-mono uppercase tracking-[0.15em] rounded-lg text-white/80">
+                        <span className={`absolute top-3 left-3 px-3 py-1 bg-black/80 backdrop-blur-md border border-white/5 text-[9px] ${activeUI.fontMono} uppercase tracking-[0.15em] rounded-lg text-white/80`}>
                           {proj.category}
                         </span>
                       </div>
 
                       <div className="space-y-1.5 px-1 pb-1">
-                        <h4 className="font-serif text-base text-white font-extrabold transition-colors duration-300 uppercase tracking-wide group-hover:text-white">
+                        <h4 className={`text-base text-white font-extrabold transition-colors duration-300 uppercase tracking-wide group-hover:text-white ${activeUI.fontDisplay}`}>
                           {proj.title}
                         </h4>
                         <p className="text-xs text-white/50 leading-relaxed font-light">
@@ -1015,7 +988,28 @@ Deployment Guidance for Blogger:
 
             <div className="flex flex-col gap-1.5">
               <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 font-bold font-mono">Operations</span>
-              <span className="text-xs font-mono text-white/60 tracking-tighter">LAT_40.7128_N_74.0060_W</span>
+              <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={onReset}
+                  className="text-white/50 hover:text-white transition-colors cursor-pointer text-left hover:underline text-xs"
+                >
+                  Reset Ledger
+                </button>
+                <span className="text-white/10 select-none">•</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSystemFixed(false);
+                    try {
+                      safeStorage.removeItem("mythics_forge_fixed");
+                    } catch {}
+                  }}
+                  className="text-red-400/60 hover:text-red-400 transition-colors cursor-pointer text-left hover:underline text-xs font-bold"
+                >
+                  Trigger Failure
+                </button>
+              </div>
             </div>
 
             {/* Legal Trust compliance pathways (Cookie Notice, Terms, Support Hub) */}
@@ -1279,7 +1273,7 @@ Deployment Guidance for Blogger:
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
               transition={{ type: "spring", stiffness: 260, damping: 25 }}
-              className="absolute bottom-16 right-0 w-80 sm:w-96 h-[500px] bg-[#0A0918]/95 backdrop-blur-xl border border-indigo-500/25 rounded-2xl flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden"
+              className="fixed bottom-24 right-4 left-4 sm:left-auto sm:right-6 sm:bottom-24 w-auto sm:w-96 h-[500px] max-h-[70vh] sm:max-h-none bg-[#0A0918]/95 backdrop-blur-xl border border-indigo-500/25 rounded-2xl flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden"
             >
               {/* Header Box */}
               <div className="p-4 bg-gradient-to-r from-indigo-950/80 via-purple-950/50 to-[#0A0918] border-b border-indigo-500/10 flex items-center justify-between">
@@ -1487,6 +1481,258 @@ Deployment Guidance for Blogger:
           </div>
         </motion.button>
       </div>
+
+      {/* AESTHETIC FORGE COMPANION - FLOATING THEME SWITCHER */}
+      <div id="aesthetic-forge-module" className="fixed bottom-6 left-6 z-40 font-sans">
+        <AnimatePresence>
+          {isThemeMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              transition={{ type: "spring", stiffness: 260, damping: 25 }}
+              className="fixed bottom-24 left-4 right-4 sm:right-auto sm:left-6 sm:bottom-24 w-auto sm:w-80 max-h-[460px] bg-[#0A0918]/95 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden"
+              style={{ borderColor: activeAccent.accentHex + '33' }}
+            >
+              {/* Header Box */}
+              <div className="p-4 bg-gradient-to-r from-slate-950/80 via-slate-900/50 to-[#0A0918] border-b border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
+                    <Palette className="w-3.5 h-3.5" style={{ color: activeAccent.accentHex }} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono uppercase tracking-widest text-[#FFD1B3] font-black flex items-center gap-1">
+                      <span>Aesthetic Forge</span>
+                      <Sparkles className="w-3 h-3 text-[#F9AB00]" />
+                    </h4>
+                    <span className="text-[8px] text-slate-400 font-mono tracking-wider">INTERFACE TEMPERATURE</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsThemeMenuOpen(false)}
+                  className="w-6 h-6 flex items-center justify-center bg-white/5 hover:bg-white/10 hover:text-white rounded-lg border border-white/10 text-slate-400 transition-colors cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Theme Grid */}
+              <div className="flex-1 overflow-y-auto p-3.5 space-y-1.5 scrollbar-thin">
+                {Object.entries(PRESET_UI_VARIATIONS).map(([key, details]) => {
+                  const targetAccent = THEME_ACCENTS[key as keyof typeof THEME_ACCENTS] || THEME_ACCENTS.orange;
+                  const isCurrent = activePreset === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => handleSelectPreset(key)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border transition-all text-left cursor-pointer duration-200 ${
+                        isCurrent 
+                          ? "bg-white/[0.04] text-white font-bold" 
+                          : "bg-transparent text-slate-400 hover:text-white hover:bg-white/[0.01]"
+                      }`}
+                      style={{
+                        borderColor: isCurrent ? targetAccent.accentHex + '40' : 'rgba(255, 255, 255, 0.04)'
+                      }}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Glowing preset color dot */}
+                        <div 
+                          className="w-3 h-3 rounded-full relative shrink-0 transition-all duration-300"
+                          style={{ 
+                            backgroundColor: targetAccent.accentHex,
+                            boxShadow: `0 0 10px ${targetAccent.accentHex}`
+                          }}
+                        />
+                        <div className="min-w-0">
+                          <span className="text-[11px] block leading-none font-sans truncate">{details.name}</span>
+                          <span className="text-[8px] font-mono opacity-50 block mt-0.5 uppercase tracking-wide truncate">{details.decorativeTitleSuffix.replace(" // ", "").replace(" [", "").replace("]", "").replace("(", "").replace(")", "")}</span>
+                        </div>
+                      </div>
+                      {isCurrent && (
+                        <Check className="w-3.5 h-3.5 shrink-0" style={{ color: targetAccent.accentHex }} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Footer */}
+              <div className="p-3 bg-slate-950/40 border-t border-white/5 text-[9px] font-mono text-slate-500 text-center leading-normal">
+                Morphians Engine auto-transforms layouts, fonts, scanlines, and rounded corners.
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Theme Switcher Launcher FAB Button */}
+        <motion.button
+          onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+          animate={isThemeMenuOpen ? { rotate: [0, -90, 0] } : { scale: [1, 1.05, 1] }}
+          transition={isThemeMenuOpen ? { duration: 0.3 } : { duration: 2.5, repeat: Infinity }}
+          className="w-12 h-12 bg-slate-950/80 border border-white/10 rounded-full flex items-center justify-center text-white shadow-[0_4px_25px_rgba(0,0,0,0.55)] cursor-pointer hover:scale-105 active:scale-95 transition-transform z-50 relative overflow-hidden group"
+          id="aesthetic-launcher-btn"
+          style={{ borderColor: activeAccent.accentHex + '40' }}
+        >
+          {/* Pulsing light ring */}
+          <div className="absolute inset-0 bg-white/5 blur-lg rounded-full opacity-60 group-hover:opacity-100 transition duration-300 scale-125 z-0"></div>
+          
+          <div className="relative z-10">
+            {isThemeMenuOpen ? (
+              <X className="w-5 h-5 text-slate-100" />
+            ) : (
+              <Palette className="w-5 h-5" style={{ color: activeAccent.accentHex }} />
+            )}
+          </div>
+        </motion.button>
+      </div>
+
+      {/* SYSTEM FAILURE EMERGENCE MODAL */}
+      <AnimatePresence>
+        {!isSystemFixed && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-[#040308] flex items-center justify-center p-4 md:p-8 overflow-y-auto"
+          >
+            {/* Ambient Red glow backdrop */}
+            <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(239,68,68,0.12)_0%,transparent_70%)] z-0" />
+            
+            {/* Cybernetic grid lines */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-[0.07] z-0" 
+              style={{
+                backgroundImage: "linear-gradient(rgba(239,68,68,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(239,68,68,0.5) 1px, transparent 1px)",
+                backgroundSize: "30px 30px"
+              }}
+            />
+
+            {/* CRT Scanline layer */}
+            <div className="fixed inset-0 pointer-events-none z-[10000] bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.25)_50%)] bg-[size:100%_4px] opacity-25" />
+
+            {/* Main Interactive Error Terminal */}
+            <motion.div
+              initial={{ scale: 0.93, y: 15, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: -10, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className="relative max-w-2xl w-full bg-[#0C0A15] border border-red-500/25 rounded-3xl p-6 md:p-8 space-y-6 shadow-[0_25px_70px_rgba(239,68,68,0.15)] z-10"
+            >
+              {/* Top status bar */}
+              <div className="flex items-center justify-between border-b border-red-500/10 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                  <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-red-400 uppercase">
+                    [ HEPHAESTUS SEC_ALERT v4.09 ]
+                  </span>
+                </div>
+                <span className="font-mono text-[9px] text-white/30 uppercase tracking-widest">
+                  SYS_ERR_STATE_CRITICAL
+                </span>
+              </div>
+
+              {/* Error Header */}
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
+                  <Flame className="w-3.5 h-3.5 text-red-500" />
+                  <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-wider">
+                    CRITICAL WORKSPACE COLLAPSE
+                  </span>
+                </div>
+                <h2 className="text-xl md:text-3xl font-mono font-black text-white tracking-tight uppercase leading-none">
+                  Core Engine Failure
+                </h2>
+                <p className="text-xs text-white/60 leading-relaxed font-sans font-light">
+                  Hephaestus quantum core reactor has experienced a sudden synchronization meltdown. Dynamic modules, creative design assets, and Swiss typography presets have decompressed. Root administration has been compromised.
+                </p>
+              </div>
+
+              {/* Simulation Log Console */}
+              <div className="bg-[#050409]/95 border border-white/5 rounded-xl p-4.5 font-mono text-[11px] leading-relaxed text-red-400/80 space-y-1.5 max-h-[160px] overflow-y-auto scrollbar-thin">
+                <p className="text-white/40 font-bold">[ SYSTEM LOG DECODER ]</p>
+                <p className="text-white/30">--------------------------------------</p>
+                <p className="flex items-center gap-2 text-red-400 font-bold">
+                  <span>[FAIL]</span> 
+                  <span className="text-white/80">x86_64_hephaestus_core: kernel panic - unable to mount root fs</span>
+                </p>
+                <p className="flex items-center gap-2 text-amber-400">
+                  <span>[WARN]</span> 
+                  <span className="text-white/70">studio_branding_matrix: fallback default preset loaded (degraded state)</span>
+                </p>
+                <p className="flex items-center gap-2 text-red-400">
+                  <span>[FAIL]</span> 
+                  <span className="text-white/80">monetag_monetization_array: token synchronization handshake timed out</span>
+                </p>
+                <p className="flex items-center gap-2 text-emerald-400">
+                  <span>[INFO]</span> 
+                  <span className="text-white/70">Companion virtual sub-intelligence standing by in offline safe-haven</span>
+                </p>
+                {isFixing && (
+                  <>
+                    <p className="text-cyan-400 animate-pulse font-bold mt-2">&gt;&gt;&gt; DYNAMIC REPAIR UTILITY ACTIVE: {Math.min(100, fixProgress)}%</p>
+                    <p className="text-cyan-300 font-bold">&gt;&gt;&gt; STATUS: {fixingStep}</p>
+                  </>
+                )}
+              </div>
+
+              {/* Interactive Fixing View or Trigger button */}
+              {isFixing ? (
+                <div className="space-y-3.5 pt-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono">
+                    <span className="text-cyan-400 font-bold uppercase tracking-wider animate-pulse">Running Recovery Matrix...</span>
+                    <span className="text-white font-black">{Math.min(100, fixProgress)}%</span>
+                  </div>
+                  {/* Progress bar wrapper */}
+                  <div className="w-full h-2 bg-white/5 border border-white/10 rounded-full overflow-hidden p-[1px]">
+                    <motion.div 
+                      className="h-full bg-gradient-to-r from-cyan-500 via-emerald-500 to-green-400 rounded-full"
+                      style={{ width: `${Math.min(100, fixProgress)}%` }}
+                      layout
+                    />
+                  </div>
+                  <p className="text-[10px] text-white/40 font-mono text-center tracking-wide leading-none animate-pulse">
+                    Do not close browser. Recalibrating server clusters...
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleFixSystem}
+                    className="flex-1 bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs uppercase tracking-widest py-3 px-5 rounded-xl border border-red-400/30 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <SlidersHorizontal className="w-4 h-4" />
+                    Fix System & Restore Core
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSystemFixed(true);
+                      try {
+                        safeStorage.setItem("mythics_forge_fixed", "true");
+                      } catch {}
+                    }}
+                    className="px-5 py-3 border border-white/10 bg-white/5 text-white/50 hover:text-white hover:bg-white/10 font-mono text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                  >
+                    Bypass Alert
+                  </button>
+                </div>
+              )}
+
+              {/* Error Footer metadata */}
+              <div className="border-t border-white/5 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[9px] font-mono text-white/30">
+                <span className="flex items-center gap-1.5">
+                  <Shield className="w-3 h-3 text-red-500/50" />
+                  HEPHAESTUS RECONSTRUCTOR MODULE [v1.0]
+                </span>
+                <span>UUID: BOOT-PANIC</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

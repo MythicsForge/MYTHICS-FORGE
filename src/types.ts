@@ -65,5 +65,5 @@ export interface StudioSettings {
   monetagZoneId?: string;
   monetagFormat?: "MultiTag" | "Popunder" | "In-Page Push" | "Smartlink" | "Custom Code";
   monetagCustomCode?: string;
-  accentPreset?: "orange" | "blue" | "green" | "purple" | "red";
+  accentPreset?: "orange" | "blue" | "green" | "purple" | "red" | "gold" | "pink" | "teal" | "cyberpunk" | "silver";
 }
