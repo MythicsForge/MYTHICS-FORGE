@@ -174,7 +174,7 @@ CURRENT MYTHICS FORGE STUDIO STATES:
 - description: "${studioSettings?.description || "An elite, independent digital craft studio."}"
 - logoText: "${studioSettings?.logoText || "MYTHICS"}"
 - tagline: "${studioSettings?.tagline || "We Build Future"}"
-- AdSense Integration Status: ${studioSettings?.adsenseEnabled ? `ACTIVE (Publisher ID: ${studioSettings.adsenseClientId}, Slot ID: ${studioSettings.adsenseSlotId}, Placement: ${studioSettings.adsensePlacement})` : "INACTIVE / DISABLED"}
+- Monetag Integration Status: ${studioSettings?.monetagEnabled ? `ACTIVE (Zone ID: ${studioSettings.monetagZoneId}, Format: ${studioSettings.monetagFormat})` : "INACTIVE / DISABLED"}
 - Active Creator Projects Showcase:
 ${projects.map((p: any, i: number) => `  ${i+1}. [Category: ${p.category}] "${p.title}" - Description: ${p.description}. Tech-Stack: ${(p.tags || []).join(", ")}`).join("\n")}
 - Chronicles/Articles Repository:
@@ -182,7 +182,7 @@ ${chronicles.map((c: any, i: number) => `  ${i+1}. "${c.title}" [Category: ${c.c
 `;
 
     const customSystemInstruction = `You are "Hephaestus", the legendary AI Forge Master and expert assistant of the "Mythics Forge" web application.
-Your mission is to resolve users' queries, give sound recommendations about web typography, teach them how to deploy customized templates to Google Blogger, and assist with AdSense embedding.
+Your mission is to resolve users' queries, give sound recommendations about web typography, teach them how to deploy customized templates to Google Blogger, and assist with Monetag embedding.
 
 Core Identity and Rules:
 1. Carry a refined, powerful, yet friendly craftsman motif (e.g., using terms like "forging", "sculpting", "metal", "artifacts", "realm").
@@ -342,17 +342,17 @@ Deployment Guidance for Blogger:
     return () => clearInterval(interval);
   }, [featuredProjects.length]);
 
-  // Reusable Google AdSense Unit Component with real scripts and fallback styling
-  const GoogleAdSenseUnit = ({ placement }: { placement: "header" | "footer" | "sidebar" }) => {
-    if (!studioSettings.adsenseEnabled) return null;
-    if (studioSettings.adsensePlacement !== placement) return null;
-
-    const clientId = studioSettings.adsenseClientId || "ca-pub-1234567890123456";
-    const slotId = studioSettings.adsenseSlotId || "9876543210";
+  // Reusable Monetag Unit Component with real scripts and fallback styling
+  const MonetagAdUnit = ({ placement }: { placement: "header" | "footer" | "sidebar" }) => {
+    if (!studioSettings.monetagEnabled) return null;
+    
+    // For visual simulation, show in matching slots
+    const zoneId = studioSettings.monetagZoneId || "8123456";
+    const format = studioSettings.monetagFormat || "MultiTag";
 
     return (
       <div 
-        id={`adsense-unit-${placement}`}
+        id={`monetag-unit-${placement}`}
         className={`w-full relative mx-auto my-6 px-4 py-3 rounded-2xl border border-dashed transition-all duration-300 ${activeAccent.borderClass} ${
           placement === "header" 
             ? `max-w-4xl bg-gradient-to-r ${activeAccent.bgClass}` 
@@ -361,33 +361,26 @@ Deployment Guidance for Blogger:
             : `max-w-5xl bg-gradient-to-r ${activeAccent.bgClass}`
         }`}
       >
-        {/* Subtle decorative AdSense logo element */}
-        <div id="adsense-glow-wrapper" className={`flex items-center justify-between text-[10px] font-mono ${activeAccent.textClass} mb-2 border-b border-white/5 pb-1.5 leading-none`}>
+        {/* Subtle decorative Monetag logo element */}
+        <div id="monetag-glow-wrapper" className={`flex items-center justify-between text-[10px] font-mono ${activeAccent.textClass} mb-2 border-b border-white/5 pb-1.5 leading-none`}>
           <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider">
             <span 
               className="w-1.5 h-1.5 rounded-full animate-pulse" 
               style={{ backgroundColor: activeAccent.accentHex }}
             />
-            <span>Google AdSense Authorized Partner</span>
+            <span>Monetag Monetization Channel</span>
           </div>
           <span 
             className="px-1.5 py-0.5 rounded text-[8px] uppercase tracking-normal"
             style={{ backgroundColor: `${activeAccent.accentHex}1A`, color: activeAccent.accentHex }}
           >
-            AD UNIT ACTIVE
+            {format} ACTIVE
           </span>
         </div>
 
-        {/* Ad container with real adsbygoogle slot */}
+        {/* Ad container mockup for preview */}
         <div className="flex items-center justify-center p-2 bg-black/40 border border-white/5 rounded-xl min-h-[90px] overflow-hidden relative">
-          <ins 
-            className="adsbygoogle"
-            style={{ display: "block", minWidth: "250px", height: placement === "sidebar" ? "250px" : "90px" }}
-            data-ad-client={clientId}
-            data-ad-slot={slotId}
-            data-ad-format={placement === "sidebar" ? "rectangle" : "horizontal"}
-            data-full-width-responsive="true"
-          />
+          <div className="monetag-native-ad" data-zone-id={zoneId} />
           
           {/* Ethereal background grid accent */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:14px_24px] opacity-25 pointer-events-none"></div>
@@ -395,13 +388,15 @@ Deployment Guidance for Blogger:
           {/* Fallback mockup preview helper inside AI Studio development frame */}
           <div className={`absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 text-center pointer-events-none select-none p-3 border border-dashed ${activeAccent.borderClass} rounded-xl`}>
             <div className="text-[11px] font-serif font-bold text-slate-200 tracking-tight">
-              Interactive Google AdSense Advertisement Unit
+              Monetag {format} Ad Unit Placement ({placement})
             </div>
-            <div className={`text-[9px] font-mono mt-1 uppercase ${activeAccent.textClass}`}>
-              Publisher: {clientId} | Slot ID: {slotId}
-            </div>
+            {zoneId && (
+              <div className={`text-[9px] font-mono mt-1 uppercase ${activeAccent.textClass}`}>
+                Zone / Script ID: {zoneId}
+              </div>
+            )}
             <div className="text-[9px] font-sans text-slate-400 mt-0.5">
-              Live banner matches Blogger theme viewport dynamically.
+              Optimized ad integration executes seamlessly inside compiled Blogger templates.
             </div>
           </div>
         </div>
@@ -617,8 +612,8 @@ Deployment Guidance for Blogger:
           )}
         </AnimatePresence>
 
-        {/* Google AdSense top banner slot */}
-        <GoogleAdSenseUnit placement="header" />
+        {/* Monetag top banner slot */}
+        <MonetagAdUnit placement="header" />
 
         {/* 1. HERO FEATURED CAROUSEL */}
         {featuredProjects.length > 0 && (
@@ -754,8 +749,8 @@ Deployment Guidance for Blogger:
           </div>
         </section>
 
-        {/* Google AdSense sidebar ad container block */}
-        <GoogleAdSenseUnit placement="sidebar" />
+        {/* Monetag sidebar ad container block */}
+        <MonetagAdUnit placement="sidebar" />
 
         {/* 2. THE VAULT PORTFOLIO REGISTRY SECTION */}
         {projects.length > 0 && (
@@ -996,9 +991,9 @@ Deployment Guidance for Blogger:
 
       </main>
 
-      {/* Google AdSense footer widget slot */}
+      {/* Monetag footer widget slot */}
       <div className="max-w-7xl mx-auto px-6">
-        <GoogleAdSenseUnit placement="footer" />
+        <MonetagAdUnit placement="footer" />
       </div>
 
       {/* FOOTER */}

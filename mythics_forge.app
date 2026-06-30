@@ -51,10 +51,10 @@
     "redditUrl": "https://www.reddit.com/user/MythicsForge",
     "linkedinUrl": "https://www.linkedin.com/company/mythics-forge",
     "instagramUrl": "https://www.instagram.com/mythics_forge",
-    "adsenseClientId": "",
-    "adsenseSlotId": "",
-    "adsenseEnabled": false,
-    "adsensePlacement": "footer",
+    "monetagEnabled": false,
+    "monetagZoneId": "",
+    "monetagFormat": "MultiTag",
+    "monetagCustomCode": "",
     "accentPreset": "orange"
   }
 }

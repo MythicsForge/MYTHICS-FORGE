@@ -117,18 +117,22 @@ app.get("/api/download-blogger-theme-xml", (req, res) => {
     // @ts-ignore
     let htmlContent = fs.readFileSync(singleFilePath, "utf8");
 
-    // Dynamic AdSense retrieval from persistent node state
-    let adsenseClientId = "";
-    let adsenseEnabled = false;
+    // Dynamic Monetag retrieval from persistent node state
+    let monetagEnabled = false;
+    let monetagZoneId = "";
+    let monetagFormat = "MultiTag";
+    let monetagCustomCode = "";
     if (fs.existsSync(APP_STATE_PATH)) {
       try {
         const stateData = JSON.parse(fs.readFileSync(APP_STATE_PATH, "utf8"));
         if (stateData && stateData.studioSettings) {
-          adsenseClientId = stateData.studioSettings.adsenseClientId || "";
-          adsenseEnabled = !!stateData.studioSettings.adsenseEnabled;
+          monetagEnabled = !!stateData.studioSettings.monetagEnabled;
+          monetagZoneId = stateData.studioSettings.monetagZoneId || "";
+          monetagFormat = stateData.studioSettings.monetagFormat || "MultiTag";
+          monetagCustomCode = stateData.studioSettings.monetagCustomCode || "";
         }
       } catch (err) {
-        console.error("⛔ Error load-decoding adsense configuration:", err);
+        console.error("⛔ Error load-decoding monetag configuration:", err);
       }
     }
 
@@ -207,10 +211,26 @@ app.get("/api/download-blogger-theme-xml", (req, res) => {
       return `${match}\n<!-- Required Blogger skeleton layout structures -->\n<div class='hidden' style='display:none !important; visibility:hidden !important; font-size:0;'>\n  <b:section id='blogger-header' maxwidgets='1' showaddelement='no'/>\n  <b:section id='blogger-main' maxwidgets='1' showaddelement='no'/>\n</div>`;
     });
 
-    // 6. Inject the dynamic AdSense Auto-Ads Core script inside the head section if enabled
-    if (adsenseEnabled && adsenseClientId) {
-      const adsenseHeaderScript = `\n<script async='async' src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}'></script>\n`;
-      htmlContent = htmlContent.replace(/<\/head>/i, () => `${adsenseHeaderScript}\n</head>`);
+    // 6. Inject the dynamic Monetag script inside the head section if enabled
+    if (monetagEnabled) {
+      let monetagHeaderScript = "";
+      if (monetagFormat === "Custom Code" && monetagCustomCode) {
+        monetagHeaderScript = `\n<!-- Monetag Custom Code integration -->\n${monetagCustomCode}\n`;
+      } else if (monetagZoneId) {
+        if (monetagFormat === "MultiTag") {
+          // Official Monetag MultiTag integration code
+          monetagHeaderScript = `\n<!-- Monetag MultiTag integration -->\n<script src="https://alwingulla.com/88/vignette.js" data-zone="${monetagZoneId}" async="async"></script>\n`;
+        } else if (monetagFormat === "Popunder") {
+          monetagHeaderScript = `\n<!-- Monetag Popunder Integration -->\n<script>(function(s,u,z,p,v,e,d){s[p]=s[p]||function(){(s[p].q=s[p].q||[]).push(arguments)};b=u.createElement(z),q=u.getElementsByTagName(z)[0];b.async=1;b.src=v;b.id=p;q.parentNode.insertBefore(b,q)})(window,document,"script","s_${monetagZoneId}","https://syndication.realsrv.com/global/vignette.js?zone=${monetagZoneId}");</script>\n`;
+        } else if (monetagFormat === "In-Page Push") {
+          monetagHeaderScript = `\n<!-- Monetag In-Page Push Integration -->\n<script>(function(s,u,z,p,v,e,d){s[p]=s[p]||function(){(s[p].q=s[p].q||[]).push(arguments)};b=u.createElement(z),q=u.getElementsByTagName(z)[0];b.async=1;b.src=v;b.id=p;q.parentNode.insertBefore(b,q)})(window,document,"script","s_${monetagZoneId}","https://syndication.realsrv.com/global/vignette.js?zone=${monetagZoneId}");</script>\n`;
+        } else if (monetagFormat === "Smartlink") {
+          monetagHeaderScript = `\n<!-- Monetag Smartlink Direct Redirect Tag -->\n<meta name="monetag-smartlink" content="https://syndication.realsrv.com/global/vignette.js?zone=${monetagZoneId}" />\n`;
+        }
+      }
+      if (monetagHeaderScript) {
+        htmlContent = htmlContent.replace(/<\/head>/i, () => `${monetagHeaderScript}\n</head>`);
+      }
     }
 
     // 7. Ensure default b:skin placeholder is injected inside <head> if no previous skin was stashed
@@ -254,7 +274,7 @@ app.get("/api/download-blogger-theme-xml", (req, res) => {
    - Unclosed meta/link void elements cleaned: ${unclosedMetaMatch ? "Action Taken" : "100% Solid"}
    - Raw Ampersands escaped cleanly: ${unescapedAmpMatch ? `Resolved (${unescapedAmpMatch.length} instances)` : "Perfect (0 raw)"}
    - CrossOrigin Standalone Tag Sanitization: Completed
-   - Built-in Google AdSense monetization node: ${adsenseEnabled ? `Enabled [Client ID: ${adsenseClientId}]` : "Ready / Dormant"}
+   - Built-in Monetag monetization node: ${monetagEnabled ? `Enabled [Zone ID: ${monetagZoneId}, Format: ${monetagFormat}]` : "Ready / Dormant"}
    - Dynamic Layout Viewport Adjustments: Active
   ========================================================================
 -->\n`;
@@ -331,7 +351,7 @@ CURRENT MYTHICS FORGE STUDIO STATES:
 - description: "${studioSettings.description || "An elite, independent digital craft studio."}"
 - logoText: "${studioSettings.logoText || "MYTHICS"}"
 - tagline: "${studioSettings.tagline || "Creative Digital Craftsmanship"}"
-- AdSense Integration Status: ${studioSettings.adsenseEnabled ? `ACTIVE (Publisher ID: ${studioSettings.adsenseClientId}, Slot ID: ${studioSettings.adsenseSlotId}, Placement: ${studioSettings.adsensePlacement})` : "INACTIVE / DISABLED"}
+- Monetag Integration Status: ${studioSettings.monetagEnabled ? `ACTIVE (Zone ID: ${studioSettings.monetagZoneId}, Format: ${studioSettings.monetagFormat})` : "INACTIVE / DISABLED"}
 - Active Creator Projects Showcase:
 ${projects.map((p: any, i: number) => `  ${i+1}. [Category: ${p.category}] "${p.title}" - Description: ${p.description}. Tech-Stack: ${(p.tags || []).join(", ")}`).join("\n")}
 - Chronicles/Articles Repository:
@@ -449,7 +469,7 @@ Deployment Guidance for Blogger:
       let currentTitle = "Mythics Forge";
       let prjsList: any[] = [];
       let chronList: any[] = [];
-      let adsenseInfo = "Disabled / Dormant";
+      let monetagInfo = "Disabled / Dormant";
 
       if (fs.existsSync(APP_STATE_PATH)) {
         try {
@@ -458,8 +478,8 @@ Deployment Guidance for Blogger:
           currentTitle = studioSettings.title || "Mythics Forge";
           prjsList = stateData.projects || [];
           chronList = stateData.chronicles || [];
-          if (studioSettings.adsenseEnabled) {
-            adsenseInfo = `Active (Publisher: ${studioSettings.adsenseClientId}, Slot: ${studioSettings.adsenseSlotId})`;
+          if (studioSettings.monetagEnabled) {
+            monetagInfo = `Active (Zone ID: ${studioSettings.monetagZoneId}, Format: ${studioSettings.monetagFormat})`;
           }
         } catch (e) {}
       }
@@ -490,18 +510,19 @@ Here is the flawless blueprint to deploy your custom **${currentTitle}** portal 
 #### Step 3: All set!
 Your Blogger site will instantly reflect your bespoke layout styles, including all reactive elements.`;
       } 
-      else if (promptLower.includes("adsense") || promptLower.includes("ads") || promptLower.includes("monetize") || promptLower.includes("publisher") || promptLower.includes("advertising")) {
-        dynamicResponse = `### 💰 Google AdSense Setup & Monetization System
+      else if (promptLower.includes("adsense") || promptLower.includes("ads") || promptLower.includes("monetize") || promptLower.includes("monetag") || promptLower.includes("advertising")) {
+        dynamicResponse = `### 💰 Monetag Setup & Monetization System
 
-I have verified our layout templates against recent Google Webmaster policies to guarantee 100% clean integration of standard AdSense elements without breaking rendering schema:
+I have verified our layout templates against recent ad-network policies to guarantee 100% clean integration of Monetag elements without breaking your XHTML rendering schema:
 
-1. **Current System Status**: AdSense is currently detected as **${adsenseInfo}**.
+1. **Current System Status**: Monetag is currently detected as **${monetagInfo}**.
 2. **Setup flow**:
    - Access the **Creator Console** on this page.
-   - Expand the **Monetization & AdSense Panel**.
-   - Tick the AdSense toggle and input your **Publisher ID** (e.g., \`pub-xxxx\`) and preferred **Slot ID**.
-   - When compiling, the Forge compiler automatically injects compliant JavaScript code inside XML CDATA sequences inside your XML export, avoiding standard XHTML tag parsing blocks.
-3. **Save and Validate**: Once you upload the template to Blogger, the placeholder banners in your layout will immediately start serving real-time bids.`;
+   - Expand the **Monetization & Monetag Panel**.
+   - Tick the Monetag toggle and input your **Zone ID** or preferred custom integration code.
+   - Choose your format (e.g., *MultiTag*, *Popunder*, *In-Page Push*, *Smartlink*, or *Custom Code*).
+   - When compiling, the Forge compiler automatically injects compliant JavaScript and metadata tags inside the XML export, avoiding XHTML tag parsing blockages.
+3. **Save and Validate**: Once you upload the template to your Blogger domain, Monetag will begin serving ads according to your zone parameters.`;
       }
       else if (promptLower.includes("project") || promptLower.includes("chronicle") || promptLower.includes("portfolio") || promptLower.includes("post") || promptLower.includes("add") || promptLower.includes("forge")) {
         let projectsSegment = "";

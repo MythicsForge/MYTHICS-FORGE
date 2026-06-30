@@ -28,10 +28,10 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   redditUrl: "https://www.reddit.com/user/MythicsForge",
   linkedinUrl: "https://www.linkedin.com/company/mythics-forge",
   instagramUrl: "https://www.instagram.com/mythics_forge",
-  adsenseClientId: "",
-  adsenseSlotId: "",
-  adsenseEnabled: false,
-  adsensePlacement: "footer",
+  monetagEnabled: false,
+  monetagZoneId: "",
+  monetagFormat: "MultiTag",
+  monetagCustomCode: "",
   accentPreset: "orange"
 };
 
@@ -55,17 +55,17 @@ function migrateStudioSettings(settings: StudioSettings): StudioSettings {
   if (!updated.instagramUrl || updated.instagramUrl === "https://instagram.com/mythics-forge") {
     updated.instagramUrl = "https://www.instagram.com/mythics_forge";
   }
-  if (updated.adsenseEnabled === undefined) {
-    updated.adsenseEnabled = false;
+  if (updated.monetagEnabled === undefined) {
+    updated.monetagEnabled = false;
   }
-  if (updated.adsenseClientId === undefined) {
-    updated.adsenseClientId = "";
+  if (updated.monetagZoneId === undefined) {
+    updated.monetagZoneId = "";
   }
-  if (updated.adsenseSlotId === undefined) {
-    updated.adsenseSlotId = "";
+  if (updated.monetagFormat === undefined) {
+    updated.monetagFormat = "MultiTag";
   }
-  if (updated.adsensePlacement === undefined) {
-    updated.adsensePlacement = "footer";
+  if (updated.monetagCustomCode === undefined) {
+    updated.monetagCustomCode = "";
   }
   if (updated.accentPreset === undefined) {
     updated.accentPreset = "orange";

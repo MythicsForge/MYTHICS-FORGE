@@ -61,9 +61,9 @@ export interface StudioSettings {
   redditUrl?: string;
   linkedinUrl?: string;
   instagramUrl?: string;
-  adsenseClientId?: string;
-  adsenseSlotId?: string;
-  adsenseEnabled?: boolean;
-  adsensePlacement?: "header" | "footer" | "sidebar" | "none";
+  monetagEnabled?: boolean;
+  monetagZoneId?: string;
+  monetagFormat?: "MultiTag" | "Popunder" | "In-Page Push" | "Smartlink" | "Custom Code";
+  monetagCustomCode?: string;
   accentPreset?: "orange" | "blue" | "green" | "purple" | "red";
 }

@@ -58,10 +58,10 @@ export default function CreatorConsole({
     redditUrl: studioSettings.redditUrl || "",
     linkedinUrl: studioSettings.linkedinUrl || "",
     instagramUrl: studioSettings.instagramUrl || "",
-    adsenseClientId: studioSettings.adsenseClientId || "",
-    adsenseSlotId: studioSettings.adsenseSlotId || "",
-    adsenseEnabled: studioSettings.adsenseEnabled || false,
-    adsensePlacement: studioSettings.adsensePlacement || "footer",
+    monetagEnabled: studioSettings.monetagEnabled || false,
+    monetagZoneId: studioSettings.monetagZoneId || "",
+    monetagFormat: studioSettings.monetagFormat || "MultiTag",
+    monetagCustomCode: studioSettings.monetagCustomCode || "",
     accentPreset: studioSettings.accentPreset || "orange"
   });
 
@@ -102,10 +102,10 @@ export default function CreatorConsole({
       redditUrl: studioSettings.redditUrl || "",
       linkedinUrl: studioSettings.linkedinUrl || "",
       instagramUrl: studioSettings.instagramUrl || "",
-      adsenseClientId: studioSettings.adsenseClientId || "",
-      adsenseSlotId: studioSettings.adsenseSlotId || "",
-      adsenseEnabled: studioSettings.adsenseEnabled || false,
-      adsensePlacement: studioSettings.adsensePlacement || "footer",
+      monetagEnabled: studioSettings.monetagEnabled || false,
+      monetagZoneId: studioSettings.monetagZoneId || "",
+      monetagFormat: studioSettings.monetagFormat || "MultiTag",
+      monetagCustomCode: studioSettings.monetagCustomCode || "",
       accentPreset: studioSettings.accentPreset || "orange"
     });
   }, [studioSettings]);
@@ -127,10 +127,10 @@ export default function CreatorConsole({
       redditUrl: settingsForm.redditUrl,
       linkedinUrl: settingsForm.linkedinUrl,
       instagramUrl: settingsForm.instagramUrl,
-      adsenseClientId: settingsForm.adsenseClientId,
-      adsenseSlotId: settingsForm.adsenseSlotId,
-      adsenseEnabled: settingsForm.adsenseEnabled,
-      adsensePlacement: settingsForm.adsensePlacement as "header" | "footer" | "sidebar" | "none",
+      monetagEnabled: settingsForm.monetagEnabled,
+      monetagZoneId: settingsForm.monetagZoneId,
+      monetagFormat: settingsForm.monetagFormat as any,
+      monetagCustomCode: settingsForm.monetagCustomCode,
       accentPreset: (settingsForm.accentPreset || "orange") as "orange" | "blue" | "green" | "purple" | "red"
     });
     triggerAlertMessage("🔥 BRANDING & COMPANY IDENTITY METAMORPHED SUCCESSFULLY!");
@@ -955,68 +955,77 @@ export default function CreatorConsole({
                   </div>
                 </div>
 
-                {/* Google AdSense monetization center */}
-                <div id="blogger-adsense-monetization-center" className="bg-[#181924]/40 border border-[#F9AB00]/20 p-5 rounded-2xl space-y-4">
+                {/* Monetag monetization center */}
+                <div id="blogger-monetag-monetization-center" className="bg-[#181924]/40 border border-emerald-500/20 p-5 rounded-2xl space-y-4">
                   <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#F9AB00] animate-pulse"></div>
-                      <h4 className="text-[#FFD1B3] text-xs font-mono uppercase tracking-wider font-bold">
-                        Google AdSense Integration Center
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <h4 className="text-emerald-100 text-xs font-mono uppercase tracking-wider font-bold">
+                        Monetag Integration Center
                       </h4>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer select-none">
                       <input 
                         type="checkbox" 
-                        checked={settingsForm.adsenseEnabled}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, adsenseEnabled: e.target.checked })}
+                        checked={settingsForm.monetagEnabled}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, monetagEnabled: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-9 h-5 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#F9AB00]/40 peer-checked:after:bg-[#F9AB00]"></div>
+                      <div className="w-9 h-5 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500/40 peer-checked:after:bg-emerald-500"></div>
                       <span className="ml-2 text-[10px] font-mono text-slate-300 uppercase">
-                        {settingsForm.adsenseEnabled ? "Connected" : "Disabled"}
+                        {settingsForm.monetagEnabled ? "Connected" : "Disabled"}
                       </span>
                     </label>
                   </div>
                   
                   <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
-                    Turn on the switch to connect your Google AdSense account. Your ad publisher scripts will automatically compile inside your custom exported Blogger XML template in full compliance with Google Webmaster policies.
+                    Enable high-CPM Monetag ads on your custom portal. Input your Monetag Zone/Script ID or paste custom integration code. Your monetization scripts will automatically compile inside your custom exported Blogger XML template safely avoiding parser blockages.
                   </p>
 
-                  {settingsForm.adsenseEnabled && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                      <div>
-                        <label className="block text-[9px] text-[#F9AB00] font-mono uppercase mb-1">AdSense Publisher Client ID</label>
-                        <input
-                          type="text"
-                          value={settingsForm.adsenseClientId}
-                          onChange={(e) => setSettingsForm({ ...settingsForm, adsenseClientId: e.target.value })}
-                          placeholder="ca-pub-1234567890123456"
-                          className="w-full bg-[#030303] border border-white/10 focus:border-[#F9AB00]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none font-mono"
-                        />
+                  {settingsForm.monetagEnabled && (
+                    <div className="space-y-4 pt-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[9px] text-emerald-400 font-mono uppercase mb-1">Monetag Zone / Script ID</label>
+                          <input
+                            type="text"
+                            value={settingsForm.monetagZoneId}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, monetagZoneId: e.target.value })}
+                            placeholder="e.g. 8123456"
+                            className="w-full bg-[#030303] border border-white/10 focus:border-emerald-500/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] text-emerald-400 font-mono uppercase mb-1">Ad Format & Tag Type</label>
+                          <select
+                            value={settingsForm.monetagFormat}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, monetagFormat: e.target.value as any })}
+                            className="w-full bg-[#030303] border border-white/10 focus:border-emerald-500/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
+                          >
+                            <option value="MultiTag">MultiTag (Vignette, Push, Popunder in 1 Tag)</option>
+                            <option value="Popunder">Popunder Smart Tag</option>
+                            <option value="In-Page Push">In-Page Push Ads</option>
+                            <option value="Smartlink">Smartlink Redirect Tag</option>
+                            <option value="Custom Code">Custom Script / Pixel Paste</option>
+                          </select>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-[9px] text-[#F9AB00] font-mono uppercase mb-1">AdSense Ad Slot ID</label>
-                        <input
-                          type="text"
-                          value={settingsForm.adsenseSlotId}
-                          onChange={(e) => setSettingsForm({ ...settingsForm, adsenseSlotId: e.target.value })}
-                          placeholder="9876543210"
-                          className="w-full bg-[#030303] border border-white/10 focus:border-[#F9AB00]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[9px] text-[#F9AB00] font-mono uppercase mb-1">Ad Display Placement</label>
-                        <select
-                          value={settingsForm.adsensePlacement}
-                          onChange={(e) => setSettingsForm({ ...settingsForm, adsensePlacement: e.target.value as any })}
-                          className="w-full bg-[#030303] border border-white/10 focus:border-[#F9AB00]/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none"
-                        >
-                          <option value="footer">Footer Wide Banner</option>
-                          <option value="header">Top Page Banner</option>
-                          <option value="sidebar">Sidebar Widget Box</option>
-                          <option value="none">Auto Ads Only (Header Script)</option>
-                        </select>
-                      </div>
+
+                      {settingsForm.monetagFormat === "Custom Code" && (
+                        <div>
+                          <label className="block text-[9px] text-emerald-400 font-mono uppercase mb-1">Paste Custom Monetag Script / Pixel Code</label>
+                          <textarea
+                            rows={4}
+                            value={settingsForm.monetagCustomCode}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, monetagCustomCode: e.target.value })}
+                            placeholder="<!-- Paste your custom Monetag javascript tag code here -->"
+                            className="w-full bg-[#030303] border border-white/10 focus:border-emerald-500/50 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-none font-mono"
+                          />
+                          <p className="text-[9px] text-slate-500 mt-1 font-sans">
+                            Enter the raw Monetag HTML/JS code block. The system will wrap this block inside protected XHTML sections in the final Blogger template export.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
