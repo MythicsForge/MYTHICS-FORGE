@@ -17,7 +17,7 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   title: "MYTHICS FORGE",
   tagline: "We Build Future",
   description: "An elite, independent digital craft studio operated by a solo developer. Designing low-latency system-level tools, high-fidelity WebGL graphics pipelines, and resilient full-stack architectures.",
-  logoText: "MF",
+  logoText: "Mythics Forge",
   logoImageUrl: logoSvg,
   logoAlignment: "center",
   logoObjectPosition: "center",
@@ -31,7 +31,8 @@ const DEFAULT_STUDIO_SETTINGS: StudioSettings = {
   adsenseClientId: "",
   adsenseSlotId: "",
   adsenseEnabled: false,
-  adsensePlacement: "footer"
+  adsensePlacement: "footer",
+  accentPreset: "orange"
 };
 
 function migrateStudioSettings(settings: StudioSettings): StudioSettings {
@@ -65,6 +66,9 @@ function migrateStudioSettings(settings: StudioSettings): StudioSettings {
   }
   if (updated.adsensePlacement === undefined) {
     updated.adsensePlacement = "footer";
+  }
+  if (updated.accentPreset === undefined) {
+    updated.accentPreset = "orange";
   }
   return updated;
 }

@@ -61,7 +61,8 @@ export default function CreatorConsole({
     adsenseClientId: studioSettings.adsenseClientId || "",
     adsenseSlotId: studioSettings.adsenseSlotId || "",
     adsenseEnabled: studioSettings.adsenseEnabled || false,
-    adsensePlacement: studioSettings.adsensePlacement || "footer"
+    adsensePlacement: studioSettings.adsensePlacement || "footer",
+    accentPreset: studioSettings.accentPreset || "orange"
   });
 
   const [isDraggingLogo, setIsDraggingLogo] = useState(false);
@@ -104,7 +105,8 @@ export default function CreatorConsole({
       adsenseClientId: studioSettings.adsenseClientId || "",
       adsenseSlotId: studioSettings.adsenseSlotId || "",
       adsenseEnabled: studioSettings.adsenseEnabled || false,
-      adsensePlacement: studioSettings.adsensePlacement || "footer"
+      adsensePlacement: studioSettings.adsensePlacement || "footer",
+      accentPreset: studioSettings.accentPreset || "orange"
     });
   }, [studioSettings]);
 
@@ -128,7 +130,8 @@ export default function CreatorConsole({
       adsenseClientId: settingsForm.adsenseClientId,
       adsenseSlotId: settingsForm.adsenseSlotId,
       adsenseEnabled: settingsForm.adsenseEnabled,
-      adsensePlacement: settingsForm.adsensePlacement as "header" | "footer" | "sidebar" | "none"
+      adsensePlacement: settingsForm.adsensePlacement as "header" | "footer" | "sidebar" | "none",
+      accentPreset: (settingsForm.accentPreset || "orange") as "orange" | "blue" | "green" | "purple" | "red"
     });
     triggerAlertMessage("🔥 BRANDING & COMPANY IDENTITY METAMORPHED SUCCESSFULLY!");
   };
@@ -539,19 +542,19 @@ export default function CreatorConsole({
             {/* COLUMN 1: HOSTED IFRAME METHOD (RECOMMENDED) */}
             <div className="bg-white/[0.02] border border-white/5 p-5 rounded-xl space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-white uppercase bg-[#FF5E13]/25 px-2.5 py-1 rounded">
-                  Method A: Clean Iframe (Highly Recommended ⭐)
+                <span className="text-xs font-mono font-bold text-white uppercase bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-1 rounded">
+                  Method A: Iframe Post Embed (Limited Sandbox Preview)
                 </span>
-                <span className="text-[10px] text-emerald-400 font-mono">Zero Code Modification</span>
+                <span className="text-[10px] text-[#A9B1D6] font-mono">Dev Sandbox Only</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                Best for embedding pages or articles inside any blog post. Blogger's editor often strips modern React scripts. Using an iframe completely circumvents Blogger's restrictions and renders your interactive gallery perfectly!
+                Best for embedding pages or articles inside any blog post. <strong className="text-amber-400 font-medium">⚠️ Important note:</strong> The active development URL (<code>${window.location.origin}</code>) is protected by sandbox security policies (<em>X-Frame-Options/CSP Clickjacking prevention</em>). Thus, modern browsers will display <span className="text-red-400 font-bold">"Refused to Connect"</span> inside Blogger posts if loaded via this live iframe. For full production deployment, please use the XML theme upload below instead.
               </p>
               
               <div className="space-y-2">
-                <label className="text-[10px] text-[#FF9E66] font-mono uppercase">Your Pasteable HTML Code:</label>
+                <label className="text-[10px] text-[#FF9E66] font-mono uppercase">Iframe HTML Code Snippet:</label>
                 <div className="relative">
-                  <pre className="bg-black/60 p-3 rounded-lg text-[10px] text-slate-300 font-mono overflow-x-auto border border-white/5 leading-relaxed max-h-[140px]">
+                  <pre className="bg-black/60 p-3 rounded-lg text-[10px] text-slate-400 font-mono overflow-x-auto border border-white/5 leading-relaxed max-h-[140px]">
 {`<div style="width:100%; height:820px; overflow:hidden; border:none; border-radius:16px; background-color:#0d0e12; box-shadow:0 15px 40px rgba(0,0,0,0.65);">
   <iframe 
     src="${window.location.origin}" 
@@ -574,10 +577,10 @@ export default function CreatorConsole({
                 </div>
               </div>
 
-              <ol className="text-[11px] text-slate-400 space-y-1.5 list-decimal list-inside leading-relaxed block pl-1">
+              <ol className="text-[11px] text-slate-400 space-y-1.5 list-decimal list-inside leading-relaxed block pl-1 font-sans">
                 <li>Create/edit a Post or Page in Blogger.</li>
                 <li>Switch from <strong>Compose View</strong> to <strong>HTML View</strong> (top-left pencil/brackets icon).</li>
-                <li>Paste the copied iframe snippet and Publish!</li>
+                <li>Paste the copied iframe snippet and Publish (Works when viewed directly within authorized session windows).</li>
               </ol>
             </div>
 
@@ -585,26 +588,31 @@ export default function CreatorConsole({
             <div className="bg-white/[0.02] border border-white/5 p-5 rounded-xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-white uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded">
-                  Method B: Full Blog Theme (Full Domain Customization)
+                  Method B: Full Blog Theme (100% Recommended ⭐)
                 </span>
-                <span className="text-[10px] text-amber-400 font-mono">Expert</span>
+                <span className="text-[10px] text-emerald-400 font-mono">Clean Production</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                Best if you want your entire Blogger domain (e.g., <code>yourblog.blogspot.com</code>) to load Mythics Forge as its main homepage. This creates a fully custom stand-alone website portal.
+                Transforms your entire Blogger domain (e.g., <code>yourblog.blogspot.com</code>) into your custom digital gallery page, completely bypassing iframe locks! 
               </p>
 
-              <div className="bg-[#161d2d]/30 border border-[#3b82f6]/20 p-3.5 rounded-lg space-y-2">
-                <h5 className="text-[11px] font-mono font-bold text-[#93c5fd]">Why the download template prevents white screens:</h5>
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Our custom build-compiler transforms the standard Vite single file bundle into an XML package, automatically wrapping all scripts in <code>{"//<![CDATA["}</code> tags and declaring Blogger layouts so the theme parses with 100% compliance.
+              <div className="bg-[#10B981]/5 border border-[#10B981]/20 p-3.5 rounded-lg space-y-2">
+                <h5 className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
+                  <span>💡 Note on Blogger Dashboard Preview warnings:</span>
+                </h5>
+                <p className="text-[10px] text-slate-300 leading-normal font-sans">
+                  The Blogger admin theme editor's layout preview tab inside <code>blogger.com</code> frequently draws a standard browser <span className="text-red-400">"Refused to Connect"</span> panel (due to nested Google sandbox cookie conflicts inside their editor frame). <strong>This is absolutely normal!</strong> 
+                </p>
+                <p className="text-[10px] text-[#A9B1D6] leading-normal font-mono">
+                  &gt; Simply open your blog URL (e.g. <span className="text-[#FF9E66]">https://yourname.blogspot.com</span>) in a fresh explorer tab. Your customized studio loads and runs flawlessly!
                 </p>
               </div>
 
               <ol className="text-[11px] text-slate-400 space-y-2 list-decimal list-inside leading-relaxed block pl-1">
-                <li>Click the <strong>Blogger XML Theme</strong> button above to download the template file.</li>
+                <li>Click the <strong>Blogger XML Theme</strong> button above to download your custom theme template file.</li>
                 <li>In Blogger dashboard, go to <strong>Theme</strong> menu in the side drawer.</li>
                 <li>Click the dropdown arrow next to <strong>Customize</strong> and select <strong>Edit HTML</strong>.</li>
-                <li>Delete everything inside, paste the contents of your downloaded XML theme file, and hit save!</li>
+                <li>Delete everything inside the text editor completely, paste the contents of your downloaded XML file, and hit save!</li>
               </ol>
             </div>
           </div>
@@ -722,14 +730,14 @@ export default function CreatorConsole({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Logo Text Symbol */}
                   <div className="sm:col-span-1">
-                    <label className="block text-[10px] text-[#FF5E13] font-mono uppercase mb-1 font-bold">Logo Alt Text (2-4 Chars)</label>
+                    <label className="block text-[10px] text-[#FF5E13] font-mono uppercase mb-1 font-bold">Logo Brand Text</label>
                     <input
                       type="text"
                       required
-                      maxLength={4}
+                      maxLength={30}
                       value={settingsForm.logoText}
                       onChange={(e) => setSettingsForm({ ...settingsForm, logoText: e.target.value })}
-                      placeholder="MF"
+                      placeholder="Mythics Forge"
                       className="w-full bg-[#030303] border border-white/10 focus:border-[#FF5E13]/52 rounded-xl px-3.5 py-2 text-xs text-slate-200 outline-none text-center font-mono font-bold"
                     />
                   </div>
@@ -822,6 +830,41 @@ export default function CreatorConsole({
                       <option value="left">Left Focus (Side)</option>
                       <option value="right">Right Focus (Side)</option>
                     </select>
+                  </div>
+                </div>
+
+                {/* Forge Accent Theme Presets */}
+                <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl space-y-3">
+                  <div>
+                    <label className="block text-[10px] text-[#FF5E13] font-mono uppercase mb-1.5 font-bold">
+                      🔥 Forge Flame Temperature (Color Accent Preset)
+                    </label>
+                    <p className="text-[10px] text-white/40 font-mono mb-3">
+                      Updates overall visual borders, glows, custom accents, and system buttons. Fully supported during Blogger theme compilation!
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {[
+                        { id: "orange", label: "Flame Orange", color: "bg-amber-500" },
+                        { id: "blue", label: "Frost Cobalt", color: "bg-sky-400" },
+                        { id: "green", label: "Emerald Rune", color: "bg-emerald-400" },
+                        { id: "purple", label: "Amethyst Leyline", color: "bg-violet-400" },
+                        { id: "red", label: "Ruby Spark", color: "bg-rose-500" },
+                      ].map((preset) => (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => setSettingsForm({ ...settingsForm, accentPreset: preset.id as any })}
+                          className={`p-2 rounded-xl border flex items-center gap-2 text-[10px] lg:text-xs font-mono font-medium transition-all cursor-pointer ${
+                            settingsForm.accentPreset === preset.id
+                              ? "bg-white/5 border-white/20 text-white shadow-sm"
+                              : "bg-transparent border-white/5 text-white/50 hover:bg-white/[0.02] hover:text-white"
+                          }`}
+                        >
+                          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${preset.color} shadow-[0_0_8px_currentColor]`} />
+                          <span>{preset.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

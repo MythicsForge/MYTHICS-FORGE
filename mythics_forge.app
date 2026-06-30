@@ -31,29 +31,30 @@
           "label": "Console Latency",
           "value": "<0.5ms"
         }
-      ]
+      ],
+      "gumroadUrl": "https://mythicsforge.gumroad.com/l/ronce"
     }
   ],
-  "chronicles": [
-    {
-      "id": "post-2",
-      "title": "Compiling the Mythics Shield raw-socket loop",
-      "summary": "Achieving zero socket allocation leakage in a highly concurrent raw packet inspect daemon.",
-      "content": "We've successfully verified the raw socket event listener loop in Mythics Shield. By binding natively to low-level Linux packet rings and loading custom packet filters directly, we bypassed substantial kernel-to-userland context switches, reaching flawless 1.2M pps packet inspection under maximum system saturation.",
-      "category": "Security",
-      "date": "2026-06-09",
-      "readTime": "4 min read",
-      "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
-    }
-  ],
+  "chronicles": [],
   "studioSettings": {
     "title": "MYTHICS FORGE",
     "tagline": "We Build Future",
     "description": "An elite, independent digital craft studio operated by a solo developer. Designing low-latency system-level tools, high-fidelity WebGL graphics pipelines, and resilient full-stack architectures.",
-    "logoText": "MF",
-    "logoImageUrl": "/src/assets/images/regenerated_image_1781023425937.png",
+    "logoText": "Mythics Forge",
+    "logoImageUrl": "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20width='100%25'%20height='100%25'%3e%3c!--%20Outer%20glowing%20background%20effect%20--%3e%3cdefs%3e%3cradialGradient%20id='glow'%20cx='50%25'%20cy='50%25'%20r='50%25'%3e%3cstop%20offset='0%25'%20stop-color='%23FF5E13'%20stop-opacity='0.15'%20/%3e%3cstop%20offset='100%25'%20stop-color='%23000'%20stop-opacity='0'%20/%3e%3c/radialGradient%3e%3c/defs%3e%3c!--%20Ambient%20background%20glow%20(optional%20but%20highly%20premium)%20--%3e%3ccircle%20cx='50'%20cy='50'%20r='48'%20fill='url(%23glow)'%20/%3e%3c!--%20Outer%20Diamond%20(Square%20Rotated%2045%20degrees)%20--%3e%3cpolygon%20points='50,4%2096,50%2050,96%204,50'%20stroke='%23f4f4f5'%20stroke-width='1.5'%20fill='none'%20stroke-linejoin='round'%20opacity='0.9'%20/%3e%3c!--%20Second%20Concentric%20Diamond%20--%3e%3cpolygon%20points='50,12%2088,50%2050,88%2012,50'%20stroke='%23f4f4f5'%20stroke-width='1'%20fill='none'%20stroke-linejoin='round'%20opacity='0.6'%20/%3e%3c!--%20Inner%20Concentric%20Diamond%20--%3e%3cpolygon%20points='50,20%2080,50%2050,80%2020,50'%20stroke='%23f4f4f5'%20stroke-width='0.75'%20fill='none'%20stroke-linejoin='round'%20opacity='0.4'%20/%3e%3c!--%20Main%20Horizontal%20Equator%20Line%20--%3e%3cline%20x1='4'%20y1='50'%20x2='96'%20y2='50'%20stroke='%23f4f4f5'%20stroke-width='1'%20opacity='0.6'%20/%3e%3c!--%20Primary%20Inverted%20Triangle%20(Base%20slightly%20raised%20to%20intersect%20diamonds%20elegantly)%20--%3e%3cpolygon%20points='18,36%2082,36%2050,78'%20stroke='%23f4f4f5'%20stroke-width='1.25'%20fill='none'%20stroke-linejoin='round'%20opacity='0.85'%20/%3e%3c!--%20Small%20Upright%20Triangle%20pointing%20to%20the%20top%20apex%20--%3e%3cpolygon%20points='32,50%2068,50%2050,12'%20stroke='%23f4f4f5'%20stroke-width='1'%20fill='none'%20stroke-linejoin='round'%20opacity='0.7'%20/%3e%3c!--%20Center%20Dotted/Dashed%20Vertical%20Axis%20of%20Symmetry%20--%3e%3cline%20x1='50'%20y1='4'%20x2='50'%20y2='96'%20stroke='%23f4f4f5'%20stroke-width='1'%20stroke-dasharray='2,2'%20opacity='0.5'%20/%3e%3c/svg%3e",
     "logoAlignment": "center",
     "logoObjectPosition": "center",
-    "logoScale": "medium"
+    "logoScale": "medium",
+    "facebookUrl": "https://www.facebook.com/people/Mythics-Forge/61590690214970/",
+    "discordUrl": "https://discord.gg/rvXTmMCwJA",
+    "gumroadUrl": "https://mythicsforge.gumroad.com",
+    "redditUrl": "https://www.reddit.com/user/MythicsForge",
+    "linkedinUrl": "https://www.linkedin.com/company/mythics-forge",
+    "instagramUrl": "https://www.instagram.com/mythics_forge",
+    "adsenseClientId": "",
+    "adsenseSlotId": "",
+    "adsenseEnabled": false,
+    "adsensePlacement": "footer",
+    "accentPreset": "orange"
   }
 }

@@ -10,16 +10,17 @@ import { motion } from "motion/react";
 interface ProjectModalProps {
   project: Project;
   onClose: () => void;
+  accentHex?: string;
 }
 
 // Simple and robust parser to render case study markdown smoothly in React 19 without package conflicts
-const parseMarkdown = (text: string) => {
+const parseMarkdown = (text: string, accentHex: string = "#EC4899") => {
   const lines = text.split("\n");
   return lines.map((line, idx) => {
     if (line.startsWith("### ")) {
       return (
-        <h3 key={idx} className="font-sans text-[#EC4899] text-lg font-bold mt-6 mb-2 tracking-wide flex items-center gap-2">
-          <span className="w-1.5 h-4 bg-[#EC4899]/25 border-l-2 border-[#EC4899] rounded-sm"></span>
+        <h3 key={idx} className="font-sans text-lg font-bold mt-6 mb-2 tracking-wide flex items-center gap-2" style={{ color: accentHex }}>
+          <span className="w-1.5 h-4 bg-white/20 border-l-2 rounded-sm" style={{ borderLeftColor: accentHex }}></span>
           {line.replace("### ", "")}
         </h3>
       );
@@ -36,9 +37,9 @@ const parseMarkdown = (text: string) => {
       const boldSplit = content.split("**");
       return (
         <div key={idx} className="ml-4 mb-3 flex gap-2">
-          <span className="text-[#EC4899] font-mono font-bold text-sm select-none">{line.substring(0, 2)}</span>
+          <span className="font-mono font-bold text-sm select-none" style={{ color: accentHex }}>{line.substring(0, 2)}</span>
           <p className="text-white/70 text-sm leading-relaxed">
-            {boldSplit.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="text-[#EC4899] font-bold">{part}</strong> : part)}
+            {boldSplit.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold" style={{ color: accentHex }}>{part}</strong> : part)}
           </p>
         </div>
       );
@@ -48,7 +49,7 @@ const parseMarkdown = (text: string) => {
       const boldSplit = content.split("**");
       return (
         <li key={idx} className="ml-4 mb-2 list-disc text-white/70 text-sm leading-relaxed">
-          {boldSplit.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="text-[#EC4899] font-bold">{part}</strong> : part)}
+          {boldSplit.map((part, pIdx) => pIdx % 2 === 1 ? <strong key={pIdx} className="font-bold" style={{ color: accentHex }}>{part}</strong> : part)}
         </li>
       );
     }
@@ -65,7 +66,7 @@ const parseMarkdown = (text: string) => {
   });
 };
 
-export default function ProjectModal({ project, onClose }: ProjectModalProps) {
+export default function ProjectModal({ project, onClose, accentHex = "#EC4899" }: ProjectModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/85 transition-all duration-300">
       <motion.div
@@ -99,7 +100,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
           {/* Banner Details Overlay */}
           <div className="absolute bottom-6 left-6 right-6">
-            <span className="px-3.5 py-1.5 bg-[#EC4899]/10 border border-[#EC4899]/25 text-[#EC4899] text-[10px] font-mono uppercase tracking-widest rounded-lg">
+            <span className="px-3.5 py-1.5 text-[10px] font-mono uppercase tracking-widest rounded-lg border animate-pulse" style={{ backgroundColor: `${accentHex}10`, borderColor: `${accentHex}30`, color: accentHex }}>
               {project.category}
             </span>
             <h2 className="text-2xl md:text-3xl font-serif font-black text-white mt-4 uppercase tracking-tight">
@@ -116,7 +117,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           {/* Left Column: Extensive Case Study (2 cols on large screen) */}
           <div className="md:col-span-2 space-y-6">
             <div className="prose prose-invert max-w-none">
-              {parseMarkdown(project.description)}
+              {parseMarkdown(project.description, accentHex)}
             </div>
 
             {project.gumroadUrl && (
@@ -129,10 +130,10 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                   href={project.gumroadUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-6 py-2.5 bg-gradient-to-r from-[#22C55E] to-[#10B981] hover:from-[#10B981] hover:to-[#22C55E] text-white font-black text-xs tracking-widest uppercase rounded-xl hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 border border-emerald-400/25 shrink-0"
+                  className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-xs tracking-widest uppercase rounded-xl hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 border border-emerald-400/25 shrink-0"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  Buy from Gumroad
+                  Acquire Repo
                 </a>
               </div>
             )}
@@ -143,23 +144,23 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
           {/* Right Column: Meta-Specs / Technical Ledger */}
           <div className="space-y-6">
             {/* Project Specifications Card */}
-            <div className="bg-white/[0.02] border border-white/[0.06] p-5 rounded-2xl space-y-4 shadow-sm backdrop-blur-md">
-              <h4 className="text-[#EC4899] text-[10px] tracking-[0.2em] font-bold uppercase font-sans border-b border-white/[0.06] pb-2">
+            <div className="bg-white/[0.01] border border-white/[0.05] p-5 rounded-2xl space-y-4 shadow-sm backdrop-blur-md">
+              <h4 className="text-[10px] tracking-[0.2em] font-bold uppercase font-mono border-b border-white/[0.05] pb-2" style={{ color: accentHex }}>
                 SPECS LEDGER
               </h4>
 
               {/* Specific Metadata parameters */}
               <div className="space-y-3 font-sans text-xs">
                 <div className="flex justify-between items-center text-white/50">
-                  <span className="flex items-center gap-2"><User className="w-3.5 h-3.5 text-[#EC4899]" /> Crew Role</span>
+                  <span className="flex items-center gap-2"><User className="w-3.5 h-3.5" style={{ color: accentHex }} /> Crew Role</span>
                   <span className="text-white font-medium text-right text-xs max-w-[150px] truncate" title={project.role}>{project.role}</span>
                 </div>
                 <div className="flex justify-between items-center text-white/50">
-                  <span className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-[#EC4899]" /> Patron</span>
+                  <span className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5" style={{ color: accentHex }} /> Patron</span>
                   <span className="text-white font-medium">{project.client}</span>
                 </div>
                 <div className="flex justify-between items-center text-white/50">
-                  <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5 text-[#EC4899]" /> Timeline</span>
+                  <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" style={{ color: accentHex }} /> Timeline</span>
                   <span className="text-white font-medium">{project.timeline}</span>
                 </div>
               </div>
@@ -167,14 +168,14 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
             {/* Core Metrics / Real Performance Stats */}
             {project.stats && project.stats.length > 0 && (
-              <div className="bg-gradient-to-br from-[#4F46E5]/10 to-[#EC4899]/10 border border-white/[0.06] p-5 rounded-2xl space-y-4 backdrop-blur-md">
-                <h4 className="text-[#EC4899] text-[10px] tracking-[0.2em] font-bold uppercase font-sans flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-[#EC4899]" /> PERF TARGETS
+              <div className="border border-white/[0.05] p-5 rounded-2xl space-y-4 backdrop-blur-md" style={{ backgroundColor: `${accentHex}06` }}>
+                <h4 className="text-[10px] tracking-[0.2em] font-bold uppercase font-mono flex items-center gap-2" style={{ color: accentHex }}>
+                  <BarChart2 className="w-4 h-4" /> PERF TARGETS
                 </h4>
 
                 <div className="space-y-3.5">
                   {project.stats.map((stat, sIdx) => (
-                    <div key={sIdx} className="border-l-2 border-[#EC4899]/30 pl-3">
+                    <div key={sIdx} className="border-l-2 pl-3" style={{ borderLeftColor: `${accentHex}30` }}>
                       <p className="text-[9px] text-white/40 uppercase tracking-widest font-mono">
                         {stat.label}
                       </p>
@@ -196,7 +197,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                 {project.tags.map((tag, tIdx) => (
                   <span
                     key={tIdx}
-                    className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] text-white/60 text-xs font-mono rounded-xl"
+                    className="px-2.5 py-1.5 bg-white/[0.02] border border-white/[0.05] text-white/60 text-xs font-mono rounded-xl"
                   >
                     {tag}
                   </span>
@@ -212,10 +213,10 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                     href={project.gumroadUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3 px-4 bg-gradient-to-r from-[#22C55E] to-[#10B981] hover:from-[#10B981] hover:to-[#22C55E] text-white font-extrabold text-xs tracking-widest uppercase rounded-full hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 border border-emerald-400/25"
+                    className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-extrabold text-xs tracking-widest uppercase rounded-full hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/10 border border-emerald-400/25"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    Buy from Gumroad
+                    Acquire Repo
                   </a>
                 )}
                 {project.liveUrl && (
@@ -223,7 +224,11 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                     href={project.liveUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3 px-4 bg-gradient-to-r from-[#4F46E5] to-[#EC4899] hover:from-[#EC4899] hover:to-[#4F46E5] text-white font-extrabold text-xs tracking-widest uppercase rounded-full hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#4F46E5]/10"
+                    className="w-full py-3 px-4 text-white font-extrabold text-xs tracking-widest uppercase rounded-full hover:scale-102 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                    style={{
+                      backgroundImage: `linear-gradient(to right, ${accentHex}, ${accentHex}dd)`,
+                      boxShadow: `0 10px 25px -5px ${accentHex}40`
+                    }}
                   >
                     <ExternalLink className="w-4 h-4" />
                     Launch Live App
@@ -236,7 +241,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                     rel="noreferrer"
                     className="w-full py-3 px-4 bg-white/[0.03] border border-white/[0.08] text-white font-bold text-xs tracking-widest uppercase rounded-full flex items-center justify-center gap-2 hover:bg-white/[0.06] transition-all duration-300 cursor-pointer"
                   >
-                    <Github className="w-4 h-4 text-[#EC4899]" />
+                    <Github className="w-4 h-4" style={{ color: accentHex }} />
                     Inspect Runes
                   </a>
                 )}
@@ -248,7 +253,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
         {/* Footer info stamp */}
         <div className="bg-[#05040B] border-t border-white/[0.06] px-6 py-4 flex justify-between items-center text-[9px] text-white/30 font-mono tracking-widest">
           <span className="flex items-center gap-1.5 uppercase">
-            <Shield className="w-3.5 h-3.5 text-[#EC4899]/40" /> SECURE REPO CHECK OK
+            <Shield className="w-3.5 h-3.5 text-white/20" /> SECURE REPO CHECK OK
           </span>
           <span>VAL_ID: MF_SYS_{project.id.toUpperCase()}</span>
         </div>

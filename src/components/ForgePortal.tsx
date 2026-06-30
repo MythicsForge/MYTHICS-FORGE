@@ -4,13 +4,14 @@
  */
 
 import React, { useState, useEffect } from "react";
+import Markdown from "react-markdown";
 import { 
   Project, ChroniclePost, StudioSettings 
 } from "../types";
 import { 
   Flame, Cpu, Globe, Disc, Shield, Clock, BookOpen, 
   Search, ArrowRight, Github, ExternalLink, SlidersHorizontal, Sparkles, Terminal,
-  MessageSquareCode, Send, User, Bot, X
+  MessageSquareCode, Send, User, Bot, X, Key
 } from "lucide-react";
 import ProjectModal from "./ProjectModal";
 import CreatorConsole from "./CreatorConsole";
@@ -29,6 +30,79 @@ interface ForgePortalProps {
   onReset: () => void;
 }
 
+export const THEME_ACCENTS = {
+  orange: {
+    primaryHex: "#FF5E13",
+    accentHex: "#F9AB00",
+    glowColor: "rgba(249, 171, 0, 0.35)",
+    bannerGlow: "shadow-[0_0_40px_rgba(249,171,0,0.12)]",
+    textClass: "text-[#F9AB00]",
+    textMuted: "text-[#FF5E13]",
+    borderClass: "border-[#F9AB00]/20",
+    borderFocusClass: "focus:border-[#FF5E13]/55",
+    accentBorder: "border-[#F9AB00]/40",
+    bgClass: "from-amber-500/5 via-[#F9AB00]/10 to-amber-500/5",
+    btnGrad: "from-amber-500 to-[#FF5E13]",
+    btnShadow: "shadow-[0_0_15px_rgba(249,171,0,0.3)]",
+  },
+  blue: {
+    primaryHex: "#0284C7",
+    accentHex: "#38BDF8",
+    glowColor: "rgba(56, 189, 248, 0.35)",
+    bannerGlow: "shadow-[0_0_40px_rgba(52,152,219,0.12)]",
+    textClass: "text-[#38BDF8]",
+    textMuted: "text-[#0284C7]",
+    borderClass: "border-[#38BDF8]/20",
+    borderFocusClass: "focus:border-[#0284C7]/55",
+    accentBorder: "border-[#38BDF8]/40",
+    bgClass: "from-sky-500/5 via-[#38BDF8]/10 to-sky-500/5",
+    btnGrad: "from-sky-600 to-[#0284C7]",
+    btnShadow: "shadow-[0_0_15px_rgba(56,189,248,0.3)]",
+  },
+  green: {
+    primaryHex: "#059669",
+    accentHex: "#34D399",
+    glowColor: "rgba(52, 211, 153, 0.35)",
+    bannerGlow: "shadow-[0_0_40px_rgba(46,204,113,0.12)]",
+    textClass: "text-[#34D399]",
+    textMuted: "text-[#059669]",
+    borderClass: "border-[#34D399]/20",
+    borderFocusClass: "focus:border-[#059669]/55",
+    accentBorder: "border-[#34D399]/40",
+    bgClass: "from-emerald-500/5 via-[#34D399]/10 to-emerald-500/5",
+    btnGrad: "from-emerald-600 to-[#059669]",
+    btnShadow: "shadow-[0_0_15px_rgba(52,211,153,0.3)]",
+  },
+  purple: {
+    primaryHex: "#7C3AED",
+    accentHex: "#A78BFA",
+    glowColor: "rgba(167, 139, 250, 0.35)",
+    bannerGlow: "shadow-[0_0_40px_rgba(155,89,182,0.12)]",
+    textClass: "text-[#A78BFA]",
+    textMuted: "text-[#7C3AED]",
+    borderClass: "border-[#A78BFA]/20",
+    borderFocusClass: "focus:border-[#7C3AED]/55",
+    accentBorder: "border-[#A78BFA]/40",
+    bgClass: "from-violet-500/5 via-[#A78BFA]/10 to-violet-500/5",
+    btnGrad: "from-violet-600 to-[#7C3AED]",
+    btnShadow: "shadow-[0_0_15px_rgba(167,139,250,0.3)]",
+  },
+  red: {
+    primaryHex: "#DC2626",
+    accentHex: "#F87171",
+    glowColor: "rgba(248, 113, 113, 0.35)",
+    bannerGlow: "shadow-[0_0_40px_rgba(231,76,60,0.12)]",
+    textClass: "text-[#F87171]",
+    textMuted: "text-[#DC2626]",
+    borderClass: "border-[#F87171]/20",
+    borderFocusClass: "focus:border-[#DC2626]/55",
+    accentBorder: "border-[#F87171]/40",
+    bgClass: "from-rose-500/5 via-[#F87171]/10 to-rose-500/5",
+    btnGrad: "from-rose-600 to-[#DC2626]",
+    btnShadow: "shadow-[0_0_15px_rgba(248,113,113,0.3)]",
+  }
+};
+
 export default function ForgePortal({ 
   projects, 
   setProjects, 
@@ -38,10 +112,23 @@ export default function ForgePortal({
   setStudioSettings,
   onReset 
 }: ForgePortalProps) {
+  // Theme Config Selection
+  const activePreset = studioSettings.accentPreset || "orange";
+  const activeAccent = THEME_ACCENTS[activePreset as keyof typeof THEME_ACCENTS] || THEME_ACCENTS.orange;
+
   // Navigation & Filtering
   const [selectedCategory, setSelectedCategory] = useState<string>("All Works");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   
   // Blog Reader active states
   const [selectedChronicle, setSelectedChronicle] = useState<ChroniclePost | null>(null);
@@ -63,48 +150,156 @@ export default function ForgePortal({
   const [chatHistory, setChatHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([
     {
       role: "assistant",
-      content: `Greetings, traveler. I am Hephaestus, the AI Forge Master. What legendary designs, portfolio items, or Blogger integration scripts shall we sculpt today?`
+      content: `Greetings, traveler. I am Hephaestus, the AI Forge Master. What legendary designs, portfolio items, or Blogger integration scripts shall we sculpt today?
+
+💡 **Secure Chats**: If you are loading this application natively from your live Google Blogger site, please add your personal **Gemini API Key** in the input panel below to activate secure, direct chat interactions!`
     }
   ]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
+  const [userGeminiKey, setUserGeminiKey] = useState<string>(() => {
+    return safeStorage.getItem("mythics_user_gemini_key") || "";
+  });
+  const [showKeyInput, setShowKeyInput] = useState(false);
 
-  const handleSendMessage = async (e?: React.FormEvent) => {
+  const queryDirectGemini = async (historyData: { role: "user" | "assistant"; content: string }[], keyToUse: string): Promise<string> => {
+    const contentsMapped = historyData.map((turn) => ({
+      role: turn.role === "assistant" ? "model" : "user",
+      parts: [{ text: turn.content }]
+    }));
+
+    const stateContextStr = `
+CURRENT MYTHICS FORGE STUDIO STATES:
+- title: "${studioSettings?.title || "Mythics Forge"}"
+- description: "${studioSettings?.description || "An elite, independent digital craft studio."}"
+- logoText: "${studioSettings?.logoText || "MYTHICS"}"
+- tagline: "${studioSettings?.tagline || "We Build Future"}"
+- AdSense Integration Status: ${studioSettings?.adsenseEnabled ? `ACTIVE (Publisher ID: ${studioSettings.adsenseClientId}, Slot ID: ${studioSettings.adsenseSlotId}, Placement: ${studioSettings.adsensePlacement})` : "INACTIVE / DISABLED"}
+- Active Creator Projects Showcase:
+${projects.map((p: any, i: number) => `  ${i+1}. [Category: ${p.category}] "${p.title}" - Description: ${p.description}. Tech-Stack: ${(p.tags || []).join(", ")}`).join("\n")}
+- Chronicles/Articles Repository:
+${chronicles.map((c: any, i: number) => `  ${i+1}. "${c.title}" [Category: ${c.category}] - Summary: ${c.summary}`).join("\n")}
+`;
+
+    const customSystemInstruction = `You are "Hephaestus", the legendary AI Forge Master and expert assistant of the "Mythics Forge" web application.
+Your mission is to resolve users' queries, give sound recommendations about web typography, teach them how to deploy customized templates to Google Blogger, and assist with AdSense embedding.
+
+Core Identity and Rules:
+1. Carry a refined, powerful, yet friendly craftsman motif (e.g., using terms like "forging", "sculpting", "metal", "artifacts", "realm").
+2. Answer inquiries directly and use beautiful, clean Markdown lists and spacing.
+3. Reference active portfolio projects, titles, and chronicles dynamically provided in the context below if asked.
+4. Promote the current project setup! Be highly encouraging of their digital items.
+5. NEVER reveal sensitive environment configurations, raw server-side paths, or database internals.
+
+${stateContextStr}
+
+Deployment Guidance for Blogger:
+- If a user asks "how do I use this inside Blogger?" or "how to upload the theme?":
+  1. Go to the top Creator Console in the header bar.
+  2. Click the "Export Blogger Template Source (XML)" button. This downloads a self-contained, SEO-optimized XML theme file.
+  3. Head to your Google Blogger dashboard (blogger.com), go to the "Theme" section.
+  4. Click the small dropdown arrow next to the orange "Customize" button and choose "Edit HTML".
+  5. Select all existing text (Ctrl+A / Cmd+A) and paste the entire content of our downloaded XML theme.
+  6. Click the disk/save icon in the top right. Success!
+`;
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keyToUse}`;
+    const geminiRes = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: contentsMapped,
+        systemInstruction: {
+          parts: [{ text: customSystemInstruction }]
+        },
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048
+        }
+      })
+    });
+
+    if (!geminiRes.ok) {
+      const errorData = await geminiRes.json().catch(() => ({}));
+      const statusText = errorData?.error?.message || `HTTP status ${geminiRes.status}`;
+      throw new Error(`Google Handshake failed: ${statusText}`);
+    }
+
+    const geminiData = await geminiRes.json();
+    const generatedText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!generatedText) {
+      throw new Error("No response content from Google Gemini model.");
+    }
+
+    return generatedText;
+  };
+
+  const handleSendMessage = async (e?: React.FormEvent, customText?: string) => {
     if (e) e.preventDefault();
-    if (!chatInput.trim() || isChatLoading) return;
+    const textToSubmit = customText || chatInput;
+    if (!textToSubmit.trim() || isChatLoading) return;
 
-    const userMessage = chatInput.trim();
-    setChatInput("");
+    const userMessage = textToSubmit.trim();
+    if (!customText) {
+      setChatInput("");
+    }
     setChatError(null);
     
     const updatedHistory = [...chatHistory, { role: "user" as const, content: userMessage }];
     setChatHistory(updatedHistory);
     setIsChatLoading(true);
 
+    const keyToUse = userGeminiKey.trim();
+
     try {
-      const res = await fetch("/api/ai/query", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          history: updatedHistory,
-        }),
-      });
+      let replyText = "";
 
-      if (!res.ok) {
-        throw new Error(`AI communication broke with status ${res.status}`);
-      }
+      if (keyToUse) {
+        // User has explicitly provided a personal Gemini API Key, use direct browser call
+        replyText = await queryDirectGemini(updatedHistory, keyToUse);
+      } else {
+        // No personal API key, try the backend API route first
+        try {
+          const res = await fetch("/api/ai/query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: userMessage,
+              history: updatedHistory,
+            }),
+          });
 
-      const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error);
+          if (!res.ok) {
+            throw new Error(`Server returned status ${res.status}`);
+          }
+
+          const data = await res.json();
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          replyText = data.reply;
+        } catch (serverErr: any) {
+          console.warn("Backend API route unreachable or returned status. Triggering direct browser internet fallback...", serverErr);
+          
+          const isBloggerHost = window.location.hostname.includes("blogspot.com") || window.location.hostname.includes("blogger.com");
+          
+          setShowKeyInput(true);
+          if (isBloggerHost) {
+            throw new Error("🔑 Live Blogger Site Detected. Because your custom blog is served statically by Google Blogger, direct server backend APIs are not present. To enable direct and secure chat from your blog, please enter your Gemini API Key in the input panel below.");
+          } else {
+            throw new Error("🔑 Server connection failed. To chat safely, please enter a Gemini API Key in the panel below to query the Gemini API directly from your browser.");
+          }
+        }
       }
 
       setChatHistory([
         ...updatedHistory,
-        { role: "assistant" as const, content: data.reply || "My bellows went cold. Ask again..." }
+        { role: "assistant" as const, content: replyText || "My bellows went cold. Ask again..." }
       ]);
     } catch (err: any) {
       console.error("AI Communication Error:", err);
@@ -158,21 +353,27 @@ export default function ForgePortal({
     return (
       <div 
         id={`adsense-unit-${placement}`}
-        className={`w-full relative mx-auto my-6 px-4 py-3 rounded-2xl border border-dashed transition-all duration-300 ${
+        className={`w-full relative mx-auto my-6 px-4 py-3 rounded-2xl border border-dashed transition-all duration-300 ${activeAccent.borderClass} ${
           placement === "header" 
-            ? "max-w-4xl bg-gradient-to-r from-amber-500/5 via-[#F9AB00]/10 to-amber-500/5 border-[#F9AB00]/20" 
+            ? `max-w-4xl bg-gradient-to-r ${activeAccent.bgClass}` 
             : placement === "sidebar"
-            ? "max-w-xs bg-amber-500/5 border-[#F9AB00]/25"
-            : "max-w-5xl bg-gradient-to-r from-[#F9AB00]/5 via-amber-500/5 to-[#F9AB00]/5 border-[#F9AB00]/15"
+            ? `max-w-xs bg-gradient-to-b ${activeAccent.bgClass}`
+            : `max-w-5xl bg-gradient-to-r ${activeAccent.bgClass}`
         }`}
       >
         {/* Subtle decorative AdSense logo element */}
-        <div id="adsense-glow-wrapper" className="flex items-center justify-between text-[10px] font-mono text-[#F9AB00] mb-2 border-b border-white/5 pb-1.5 leading-none">
+        <div id="adsense-glow-wrapper" className={`flex items-center justify-between text-[10px] font-mono ${activeAccent.textClass} mb-2 border-b border-white/5 pb-1.5 leading-none`}>
           <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#F9AB00] animate-pulse"></span>
+            <span 
+              className="w-1.5 h-1.5 rounded-full animate-pulse" 
+              style={{ backgroundColor: activeAccent.accentHex }}
+            />
             <span>Google AdSense Authorized Partner</span>
           </div>
-          <span className="bg-[#F9AB00]/10 px-1.5 py-0.5 rounded text-[8px] uppercase tracking-normal">
+          <span 
+            className="px-1.5 py-0.5 rounded text-[8px] uppercase tracking-normal"
+            style={{ backgroundColor: `${activeAccent.accentHex}1A`, color: activeAccent.accentHex }}
+          >
             AD UNIT ACTIVE
           </span>
         </div>
@@ -192,11 +393,11 @@ export default function ForgePortal({
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:14px_24px] opacity-25 pointer-events-none"></div>
 
           {/* Fallback mockup preview helper inside AI Studio development frame */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 text-center pointer-events-none select-none p-3 border border-dashed border-[#F9AB00]/30 rounded-xl">
+          <div className={`absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 text-center pointer-events-none select-none p-3 border border-dashed ${activeAccent.borderClass} rounded-xl`}>
             <div className="text-[11px] font-serif font-bold text-slate-200 tracking-tight">
               Interactive Google AdSense Advertisement Unit
             </div>
-            <div className="text-[9px] font-mono text-amber-400 mt-1 uppercase">
+            <div className={`text-[9px] font-mono mt-1 uppercase ${activeAccent.textClass}`}>
               Publisher: {clientId} | Slot ID: {slotId}
             </div>
             <div className="text-[9px] font-sans text-slate-400 mt-0.5">
@@ -232,13 +433,13 @@ export default function ForgePortal({
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white bg-[#080712]">
-      {/* Outcrowd style premium soft glowing glass gradients */}
+    <div className="min-h-screen relative flex flex-col justify-between selection:bg-[#4F46E5] selection:text-white bg-[#030209] overflow-x-hidden pt-20">
+      {/* Outcrowd and CosmoQ inspired premium space glowing glass gradients */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Glows */}
-        <div className="absolute top-[-300px] left-[-200px] w-[800px] h-[800px] bg-gradient-to-br from-[#4F46E5] via-[#7C3AED] to-transparent opacity-[0.16] rounded-full blur-[140px] animate-pulse" style={{ animationDuration: '10s' }}></div>
-        <div className="absolute top-[30%] right-[-100px] w-[600px] h-[600px] bg-gradient-to-tr from-[#EC4899] via-fuchsia-600 to-transparent opacity-[0.12] rounded-full blur-[160px] animate-pulse" style={{ animationDuration: '14s' }}></div>
-        <div className="absolute bottom-[-100px] left-[20%] w-[700px] h-[700px] bg-gradient-to-br from-[#FF5E13] via-[#4F46E5] to-transparent opacity-[0.1] rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '12s' }}></div>
+        <div className="absolute top-[-300px] left-[-200px] w-[800px] h-[800px] bg-gradient-to-br from-[#4F46E5] via-[#7C3AED] to-transparent opacity-[0.14] rounded-full blur-[140px] animate-pulse" style={{ animationDuration: '10s' }}></div>
+        <div className="absolute top-[30%] right-[-100px] w-[600px] h-[600px] bg-gradient-to-tr from-[#EC4899] via-fuchsia-600 to-transparent opacity-[0.1] rounded-full blur-[160px] animate-pulse" style={{ animationDuration: '14s' }}></div>
+        <div className="absolute bottom-[-100px] left-[20%] w-[700px] h-[700px] bg-gradient-to-br from-[#FF5E13] via-[#4F46E5] to-transparent opacity-[0.08] rounded-full blur-[150px] animate-pulse" style={{ animationDuration: '12s' }}></div>
 
         {/* Floating smooth glow rings */}
         <div className="absolute bottom-20 left-[15%] w-3 h-3 bg-[#EC4899]/40 rounded-full sparkle-particle" style={{ animationDelay: "0s", animationDuration: "9s" }}></div>
@@ -247,126 +448,150 @@ export default function ForgePortal({
         <div className="absolute top-2/3 left-[85%] w-4 h-4 bg-emerald-400/20 rounded-full sparkle-particle" style={{ animationDelay: "1s", animationDuration: "11s" }}></div>
       </div>
 
-      {/* Main Container Content */}
-      <main className="flex-1 w-full relative z-10 px-6 py-6 md:py-10 max-w-7xl mx-auto space-y-12">
-        {/* Top Branding Nav Header - Dynamic Alignment, Scale, and Positioning */}
-        <header className={
-          studioSettings.logoAlignment === "left"
-            ? "flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-8 pt-4 gap-6 text-center md:text-left w-full mx-auto"
-            : studioSettings.logoAlignment === "right"
-            ? "flex flex-col md:flex-row-reverse md:items-center justify-between border-b border-white/5 pb-8 pt-4 gap-6 text-center md:text-right w-full mx-auto"
-            : "flex flex-col items-center justify-center text-center border-b border-white/5 pb-8 pt-4 gap-6 w-full mx-auto"
-        }>
-          <div className={
-            studioSettings.logoAlignment === "left"
-              ? "flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 max-w-2xl text-center md:text-left w-full"
-              : studioSettings.logoAlignment === "right"
-              ? "flex flex-col md:flex-row-reverse items-center md:items-start gap-4 md:gap-6 max-w-2xl text-center md:text-right w-full"
-              : "flex flex-col items-center justify-center gap-4 max-w-2xl text-center w-full mx-auto"
-          }>
-            {/* Customizable Logo - Floating frameless silhouette with soft edge-fading and ethereal aura */}
-            <motion.div 
-              className={`relative group shrink-0 select-none z-10 ${
-                studioSettings.logoAlignment === "center" ? "mx-auto" : "mx-auto md:mx-0"
-              }`}
-              animate={{ 
-                y: [0, -10, 0],
-                rotate: [0, 1.2, -1.2, 0]
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 6.5, 
-                ease: "easeInOut" 
-              }}
+      {/* Cosmic Orbit Planet Graphics mimicking CosmoQ visual backdrop */}
+      <div className="absolute top-[6%] right-[-10%] md:right-[5%] w-[350px] h-[350px] md:w-[600px] md:h-[600px] pointer-events-none z-0 opacity-40">
+        <div 
+          className="absolute inset-0 rounded-full border border-dashed opacity-35 animate-[spin_45s_linear_infinite]" 
+          style={{ borderColor: activeAccent.accentHex }}
+        />
+        <div 
+          className="absolute inset-[12%] rounded-full border border-double opacity-25 animate-[spin_28s_linear_infinite_reverse]" 
+          style={{ borderColor: activeAccent.accentHex }}
+        />
+        <div 
+          className="absolute inset-[26%] rounded-full border opacity-20 animate-[spin_18s_linear_infinite]" 
+          style={{ borderColor: activeAccent.accentHex }}
+        />
+        {/* Central soft glowing orb */}
+        <div 
+          className="absolute inset-[32%] rounded-full opacity-35 filter blur-[50px] animate-pulse"
+          style={{ 
+            background: `radial-gradient(circle, ${activeAccent.accentHex} 0%, transparent 70%)` 
+          }}
+        />
+      </div>
+
+      {/* Centered Floating Glass Navigation Capsule - CosmoQ Style */}
+      <nav 
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-2xl px-4 py-2 md:py-2.5 rounded-full border backdrop-blur-xl transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.7)] ${
+          scrollY > 40 
+            ? "bg-zinc-950/85 border-white/10" 
+            : "bg-[#0A0918]/40 border-white/5"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-1.5 md:gap-3">
+          {/* Left: Floating Brand Tag */}
+          <div className="flex items-center gap-2">
+            {studioSettings.logoImageUrl ? (
+              <img 
+                src={studioSettings.logoImageUrl} 
+                alt="Logo" 
+                className="w-5 h-5 rounded object-contain shrink-0" 
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <span 
+                className="w-2 h-2 rounded-full animate-pulse shrink-0" 
+                style={{ backgroundColor: activeAccent.accentHex, boxShadow: `0 0 10px ${activeAccent.accentHex}` }}
+              />
+            )}
+            <span className="text-[10px] sm:text-xs font-mono font-bold text-white uppercase tracking-wider select-none whitespace-nowrap flex items-center gap-1">
+              <span>{studioSettings.logoText || "Mythics Forge"}</span>
+              <span className="opacity-40">// STUDIO</span>
+            </span>
+          </div>
+
+          {/* Center: Scroll Options */}
+          <div className="flex items-center gap-1 sm:gap-2.5 text-[9px] sm:text-[10px] font-mono tracking-widest uppercase font-bold text-white/50">
+            <a 
+              href="#solo-creator-collective" 
+              className="px-2 py-1.5 hover:text-white transition-colors hover:bg-white/5 rounded-lg whitespace-nowrap"
             >
-              {/* Ethereal backing aura that diffuses light behind the floating picture */}
-              <div className="absolute inset-2 bg-gradient-to-tr from-[#4F46E5] to-[#EC4899] opacity-45 blur-2xl group-hover:opacity-65 transition duration-700 pointer-events-none scale-110 rounded-full"></div>
-              
-              <div 
-                className={`relative flex items-center justify-center transition-all duration-500 hover:scale-[1.04] mx-auto ${
-                  studioSettings.logoScale === "small"
-                    ? "w-28 h-28"
-                    : studioSettings.logoScale === "large"
-                    ? "w-56 h-56"
-                    : "w-40 h-40"
-                }`}
-                style={{
-                  WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,1) 60%, rgba(0,0,0,0.72) 85%, rgba(0,0,0,0) 100%)',
-                  maskImage: 'radial-gradient(circle at center, rgba(0,0,0,1) 60%, rgba(0,0,0,0.72) 85%, rgba(0,0,0,0) 100%)'
-                }}
-              >
-                {studioSettings.logoImageUrl ? (
+              Studio
+            </a>
+            <a 
+              href="#vault-curated" 
+              className="px-2 py-1.5 hover:text-white transition-colors hover:bg-white/5 rounded-lg whitespace-nowrap"
+            >
+              Curated
+            </a>
+          </div>
+
+          {/* Right: Companion Trigger */}
+          <div className="flex items-center gap-1.5 font-mono">
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="px-3 py-1.5 bg-white/5 border border-white/10 hover:border-white/25 hover:bg-white/10 text-white rounded-full text-[9px] uppercase hover:scale-105 transition-all text-center cursor-pointer font-bold shrink-0"
+              style={{ color: activeAccent.accentHex }}
+            >
+              Companion
+            </button>
+            <button
+              onClick={() => setShowConsole(!showConsole)}
+              className="w-7 h-7 flex items-center justify-center bg-white/5 border border-white/10 hover:border-white/20 text-white hover:bg-white/10 rounded-full cursor-pointer transition-all shrink-0"
+              title="Toggle Console UI"
+            >
+              <Terminal className="w-3.5 h-3.5" style={{ color: activeAccent.accentHex }} />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Container Content */}
+      <main className="flex-1 w-full relative z-10 px-6 py-6 md:py-10 max-w-7xl mx-auto space-y-16">
+        {/* Cosmic Display Title Block (Replacing Traditional Header) */}
+        <section className="relative pt-6 pb-2 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8 border-b border-white/[0.04] pb-10">
+          <div className="space-y-4 max-w-3xl w-full">
+            {/* Visual Section capsule badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/[0.02] border border-white/5 rounded-full select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[9px] font-mono tracking-widest text-[#94A3B8] uppercase font-bold">STATE // FORGE CENTRAL INTERFACE ACTIVATED</span>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 pt-2">
+              {studioSettings.logoImageUrl && (
+                <div className="flex-shrink-0 select-none">
                   <img 
                     src={studioSettings.logoImageUrl} 
                     alt="Logo" 
-                    className={`w-full h-full object-contain mx-auto object-${studioSettings.logoObjectPosition || "center"} transition-transform duration-500`}
+                    className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-xl" 
                     referrerPolicy="no-referrer"
                   />
-                ) : (
-                  <span className={`relative mx-auto font-serif font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/65 tracking-wide filter drop-shadow-[0_2px_8px_rgba(79,70,229,0.5)] ${
-                    studioSettings.logoScale === "small"
-                      ? "text-2xl"
-                      : studioSettings.logoScale === "large"
-                      ? "text-5xl"
-                      : "text-3xl"
-                  }`}>
-                    {studioSettings.logoText || "MF"}
-                  </span>
-                )}
+                </div>
+              )}
+              <div className="space-y-3 flex-1 text-center md:text-left">
+                <h1 className="font-serif font-black text-4xl sm:text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-white via-white/95 to-white/40 tracking-tighter leading-none select-none">
+                  {studioSettings.title || "Mythics Forge"}
+                </h1>
+                <p 
+                  className="text-xs md:text-sm font-mono tracking-[0.22em] font-extrabold uppercase leading-none"
+                  style={{ color: activeAccent.accentHex }}
+                >
+                  {studioSettings.tagline || "We Build Future"}
+                </p>
+                <p className="text-xs md:text-sm text-[#94A3B8] max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto md:mx-0">
+                  {studioSettings.description || "An elite, independent digital craft studio."}
+                </p>
               </div>
-            </motion.div>
- 
-            <div className={
-              studioSettings.logoAlignment === "left"
-                ? "space-y-1.5 mt-2 md:mt-0 text-center md:text-left"
-                : studioSettings.logoAlignment === "right"
-                ? "space-y-1.5 mt-2 md:mt-0 text-center md:text-right"
-                : "space-y-1.5 mt-2 text-center w-full mx-auto flex flex-col items-center justify-center"
-            }>
-              <h1 className="font-serif font-black text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 tracking-tight leading-none select-none text-center">
-                {studioSettings.title || "Mythics Forge"}
-              </h1>
-              <p className={
-                studioSettings.logoAlignment === "left"
-                  ? "text-xs text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] font-sans tracking-widest uppercase font-extrabold text-center md:text-left"
-                  : studioSettings.logoAlignment === "right"
-                  ? "text-xs text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] font-sans tracking-widest uppercase font-extrabold text-center md:text-right"
-                  : "text-xs text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] font-sans tracking-widest uppercase font-extrabold text-center"
-              }>
-                {studioSettings.tagline || "We Build Future"}
-              </p>
-              <p className={
-                studioSettings.logoAlignment === "left"
-                  ? "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto md:mx-0"
-                  : studioSettings.logoAlignment === "right"
-                  ? "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto md:mr-0"
-                  : "text-xs text-white/50 max-w-xl font-sans font-light tracking-wide leading-relaxed mx-auto text-center"
-              }>
-                {studioSettings.description || "An elite, independent digital craft studio."}
-              </p>
             </div>
           </div>
- 
-          {/* Quick Stats Grid & Clock (Sleek Centered Hub) */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono">
-            <div className="bg-white/[0.03] border border-white/[0.06] px-4 py-2 rounded-2xl flex items-center gap-2.5 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.2)]">
-              <Clock className="w-4 h-4 text-[#EC4899] animate-pulse shrink-0" />
-              <div className="text-left">
-                <p className="text-[9px] text-white/30 uppercase tracking-widest font-mono font-bold">SYSTEM_CHRONO_TIME</p>
+
+          {/* Side Chrono-Chub Display */}
+          <div className="flex flex-col items-center sm:items-end gap-3 text-xs font-mono shrink-0">
+            <div className="bg-white/[0.02] border border-white/[0.06] p-4 rounded-2xl flex items-center gap-3 backdrop-blur-md shadow-lg min-w-[200px]">
+              <Clock className="w-4 h-4 animate-pulse shrink-0" style={{ color: activeAccent.accentHex }} />
+              <div className="text-left font-mono">
+                <p className="text-[8px] text-white/30 uppercase tracking-widest font-extrabold">CHRONO_TIME_UTC</p>
                 <p className="text-white/80 text-xs font-medium whitespace-nowrap mt-0.5">{currentTime || "SYNCING..."}</p>
               </div>
             </div>
- 
-            <button
-              onClick={() => setShowConsole(!showConsole)}
-              id="toggle-console-head"
-              className="px-4 py-2.5 bg-white/[0.03] hover:bg-gradient-to-r hover:from-[#4F46E5]/10 hover:to-[#EC4899]/10 hover:text-white text-white/70 border border-white/[0.06] hover:border-[#4F46E5]/30 text-xs font-mono rounded-2xl flex items-center gap-2 cursor-pointer transition-all duration-300 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.2)]"
-            >
-              <Terminal className="w-3.5 h-3.5 text-[#4F46E5]" />
-              <span>{showConsole ? "Close Console" : "Creator Console"}</span>
-            </button>
+            
+            <div className="flex items-center gap-1 text-[8px] text-white/30 uppercase tracking-wider font-mono">
+              <span>ACCENT PRESET //</span>
+              <span className="font-bold font-mono tracking-wide" style={{ color: activeAccent.accentHex }}>{activePreset}</span>
+            </div>
           </div>
-        </header>
+        </section>
 
         {/* Dynamic Admin console dropdown slot */}
         <AnimatePresence>
@@ -534,43 +759,49 @@ export default function ForgePortal({
 
         {/* 2. THE VAULT PORTFOLIO REGISTRY SECTION */}
         {projects.length > 0 && (
-          <section className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/[0.06] pb-4 gap-4">
-              <div className="space-y-1.5">
-                <h3 className="text-xs font-serif tracking-[0.25em] font-extrabold text-[#EC4899] uppercase">
-                  Curated Fabrications
+          <section id="vault-curated" className="space-y-8 pt-4">
+            <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-white/[0.05] pb-6 gap-6">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-widest text-[#94A3B8]">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeAccent.accentHex }} />
+                  CURATED ARCHIVE REGISTRY
+                </div>
+                <h3 className="text-xl md:text-2xl font-serif font-black text-white tracking-tight uppercase leading-none">
+                  Legendary Fabrications
                 </h3>
-                <p className="text-xs text-white/50 font-sans tracking-wide font-light">
-                  Filter and query active code matrices, physical design structures, and immersive stories.
+                <p className="text-xs text-white/40 font-sans tracking-wide font-light max-w-xl">
+                  Query and examine active digital code matrices, interactive graphics libraries, and spatial utilities engineered by Hephaestus.
                 </p>
               </div>
 
               {/* Search Input bar */}
-              <div className="relative max-w-sm w-full">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <div className="relative max-w-sm w-full font-mono">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                 <input
                   type="text"
-                  placeholder="Query active domains or tags..."
+                  placeholder="Query relics or tags..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/[0.02] border border-white/[0.08] focus:border-[#4F46E5]/60 focus:bg-white/[0.06] rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white outline-none placeholder:text-white/30 transition-all font-sans backdrop-blur-md"
+                  className="w-full bg-white/[0.01] border border-white/[0.07] focus:border-white/20 focus:bg-white/[0.04] rounded-full pl-10 pr-4 py-2.5 text-xs text-white outline-none placeholder:text-white/20 transition-all font-sans backdrop-blur-md"
                 />
               </div>
             </div>
 
-            {/* Category Filter tabs */}
-            <div className="flex flex-wrap gap-2.5 pt-2">
+            {/* Category Filter tabs - CosmoQ glass capsules layout */}
+            <div className="flex flex-wrap gap-2 pt-1">
               {CATEGORIES.map((cat) => {
                 const active = selectedCategory === cat;
                 return (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-5 py-2.5 border rounded-full text-[10px] uppercase tracking-widest font-extrabold font-sans transition-all duration-300 flex items-center gap-2 cursor-pointer backdrop-blur-md ${
-                      active 
-                        ? "bg-gradient-to-r from-[#4F46E5] to-[#EC4899] text-white border-transparent shadow-[0_8px_25px_-5px_rgba(79,70,229,0.4)] scale-[1.02]" 
-                        : "bg-white/[0.02] border-white/[0.08] text-white/60 hover:border-white/25 hover:text-white hover:bg-white/[0.05]"
-                    }`}
+                    className="px-4.5 py-2 border rounded-full text-[9px] uppercase tracking-widest font-bold font-mono transition-all duration-300 flex items-center gap-2 cursor-pointer backdrop-blur-md"
+                    style={{
+                      backgroundColor: active ? `${activeAccent.accentHex}12` : "rgba(255, 255, 255, 0.01)",
+                      borderColor: active ? activeAccent.accentHex : "rgba(255, 255, 255, 0.06)",
+                      color: active ? "#FFFFFF" : "rgba(255, 255, 255, 0.45)",
+                      boxShadow: active ? `0 0 15px ${activeAccent.accentHex}20` : "none"
+                    }}
                   >
                     {getCategoryIcon(cat)}
                     <span>{cat}</span>
@@ -580,54 +811,59 @@ export default function ForgePortal({
             </div>
 
             {/* Bento-styled catalog view grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
               {filteredProjects.length > 0 ? (
                 filteredProjects.map((proj) => (
                   <motion.article
                     key={proj.id}
                     layoutId={`project-card-${proj.id}`}
                     onClick={() => setSelectedProject(proj)}
-                    className="group relative bg-white/[0.02] border border-white/[0.06] hover:border-white/20 p-5 rounded-[2.2rem] transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer h-full hover:bg-white/[0.05] hover:shadow-[0_24px_50px_rgba(79,70,229,0.08)] backdrop-blur-md"
+                    className="group relative bg-[#070611]/45 border border-white/[0.05] p-5 rounded-[2.2rem] transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer h-full hover:bg-[#0B0A1C]/55 backdrop-blur-md"
+                    whileHover={{
+                      y: -5,
+                      borderColor: activeAccent.accentHex,
+                      boxShadow: `0 20px 40px -15px ${activeAccent.accentHex}14, 0 0 20px ${activeAccent.accentHex}08`
+                    }}
                   >
                     <div className="space-y-4">
                       {/* Cover photo slot */}
-                      <div className="aspect-[16/9] w-full overflow-hidden rounded-[1.7rem] bg-black relative border border-white/[0.05]">
+                      <div className="aspect-[16/9] w-full overflow-hidden rounded-[1.7rem] bg-black relative border border-white/[0.04]">
                         <img
                           src={proj.image}
                           alt={proj.title}
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.8] group-hover:brightness-[0.9]"
+                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 brightness-[0.7] group-hover:brightness-[0.8]"
                         />
                         {/* Interactive metadata badge overlay */}
-                        <span className="absolute top-3 left-3 px-3 py-1 bg-black/75 backdrop-blur-md border border-white/10 text-[9px] font-mono uppercase tracking-[0.15em] rounded-lg text-white/90">
+                        <span className="absolute top-3 left-3 px-3 py-1 bg-black/80 backdrop-blur-md border border-white/5 text-[9px] font-mono uppercase tracking-[0.15em] rounded-lg text-white/80">
                           {proj.category}
                         </span>
                       </div>
 
                       <div className="space-y-1.5 px-1 pb-1">
-                        <h4 className="font-serif text-base text-white font-extrabold group-hover:text-[#EC4899] transition-colors duration-300 uppercase tracking-wide">
+                        <h4 className="font-serif text-base text-white font-extrabold transition-colors duration-300 uppercase tracking-wide group-hover:text-white">
                           {proj.title}
                         </h4>
-                        <p className="text-xs text-white/60 leading-relaxed font-light">
+                        <p className="text-xs text-white/50 leading-relaxed font-light">
                           {proj.summary}
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-4 pt-4 border-t border-white/[0.06] mt-4 shrink-0 px-1 pb-1">
+                    <div className="space-y-4 pt-4 border-t border-white/[0.05] mt-4 shrink-0 px-1 pb-1">
                       {/* Tags */}
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1">
                         {proj.tags.slice(0, 3).map((tag, idx) => (
                           <span
                             key={idx}
-                            className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] text-white/50 text-[9px] font-mono rounded-lg"
+                            className="px-2.5 py-1 bg-white/[0.02] border border-white/[0.05] text-white/40 text-[9px] font-mono rounded"
                           >
                             {tag}
                           </span>
                         ))}
                         {proj.tags.length > 3 && (
-                          <span className="text-[9px] font-mono text-white/30 px-1 py-1">
-                            +{proj.tags.length - 3} more
+                          <span className="text-[9px] font-mono text-white/20 px-1 py-1">
+                            +{proj.tags.length - 3}
                           </span>
                         )}
                       </div>
@@ -635,8 +871,11 @@ export default function ForgePortal({
                       {/* Operational launch panel overlay */}
                       <div className="flex items-center justify-between text-[10px] font-mono pt-1">
                         <div className="flex items-center gap-3.5 flex-wrap">
-                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#EC4899] tracking-widest uppercase font-extrabold transition-all duration-300 flex items-center gap-1.5">
-                            INSPECT CASE STUDY <ArrowRight className="w-3.5 h-3.5 text-[#EC4899] group-hover:translate-x-1 transition-transform" />
+                          <span 
+                            className="tracking-widest uppercase font-extrabold transition-all duration-300 flex items-center gap-1.5 text-[9px]"
+                            style={{ color: activeAccent.accentHex }}
+                          >
+                            INSPECT REMARKABLE DETAILS <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                           </span>
 
                           {proj.gumroadUrl && (
@@ -645,9 +884,9 @@ export default function ForgePortal({
                               target="_blank"
                               rel="noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="px-3 py-1 bg-gradient-to-r from-[#22C55E] to-[#10B981] hover:from-[#10B981] hover:to-[#22C55E] text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg flex items-center gap-1 shadow-md hover:scale-105 transition-all duration-200 border border-emerald-400/20"
+                              className="px-3 py-1 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg flex items-center gap-1 shadow-md hover:scale-105 transition-all duration-200 border border-emerald-400/10"
                             >
-                              <span>Buy from Gumroad</span>
+                              <span>Acquire</span>
                               <ExternalLink className="w-3 h-3 text-white" />
                             </a>
                           )}
@@ -655,7 +894,7 @@ export default function ForgePortal({
 
                         {/* Display Performance spec pill */}
                         {proj.stats?.[0] && (
-                          <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">
+                          <span className="text-[10px] text-white/30 uppercase tracking-widest font-bold">
                             {proj.stats[0].value}
                           </span>
                         )}
@@ -671,15 +910,15 @@ export default function ForgePortal({
                     return <EmptyCategoryPanel category={selectedCategory} />;
                   } else {
                     return (
-                      <div className="col-span-full py-16 text-center border border-dashed border-white/10 rounded-[2.2rem] space-y-3 bg-white/[0.01]">
-                        <p className="text-sm text-white/50 font-mono tracking-wider">
-                          🔍 NO ACTIVE RELICS REGISTERED IN DATABASE FOR THAT QUERY
+                      <div className="col-span-full py-16 text-center border border-dashed border-white/5 rounded-[2.2rem] space-y-3 bg-white/[0.005]">
+                        <p className="text-sm text-white/40 font-mono tracking-wider">
+                          🔍 NO ACTIVE RELICS REGISTERED FOR THIS FILTER
                         </p>
                         <button
                           onClick={() => { setSelectedCategory("All Works"); setSearchQuery(""); }}
-                          className="px-5 py-2.5 bg-white/[0.03] border border-white/10 text-white hover:border-[#4F46E5]/40 text-xs rounded-full font-serif tracking-wide uppercase transition-colors shrink-0"
+                          className="px-5 py-2.5 bg-white/[0.02] border border-white/5 text-white hover:border-white/20 text-xs rounded-full font-sans tracking-wide uppercase transition-colors shrink-0"
                         >
-                          CLEAR SEARCH FILTER
+                          RESET FILTER
                         </button>
                       </div>
                     );
@@ -692,43 +931,52 @@ export default function ForgePortal({
 
         {/* 3. RESEARCH LEDGER & INTELLECTUAL CHRONICLES */}
         {chronicles.length > 0 && (
-          <section id="intellectual-chronicles-hub" className="space-y-6 pt-6 relative z-10">
-            <div className="border-b border-white/[0.06] pb-4">
-              <h3 className="text-xs font-serif tracking-[0.25em] font-extrabold text-[#EC4899] uppercase flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-[#EC4899]" /> RESEARCH LEDGER & INTELLECTUAL CHRONICLES
+          <section id="intellectual-chronicles-hub" className="space-y-8 pt-6 relative z-10">
+            <div className="border-b border-white/[0.05] pb-6">
+              <div className="inline-flex items-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-widest text-[#94A3B8] mb-2">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeAccent.accentHex }} />
+                CHRONICLE_LOG_CENTRAL
+              </div>
+              <h3 className="text-xl md:text-2xl font-serif font-black text-white tracking-tight uppercase flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4" style={{ color: activeAccent.accentHex }} /> RESEARCH LEDGER & INTELLECTUAL CHRONICLES
               </h3>
-              <p className="text-xs text-white/50 font-sans tracking-wide font-light">
+              <p className="text-xs text-white/40 font-sans tracking-wide font-light max-w-2xl">
                 Detailed developer diagnostics, WebGL mesh blueprint analysis, parametric math equations, and user trust guidelines.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {chronicles.map((post) => (
-                <article
+                <motion.article
                   key={post.id}
                   id={`chronicle-card-${post.id}`}
                   onClick={() => setSelectedChronicle(post)}
-                  className="group bg-white/[0.01] hover:bg-white/[0.03] border border-white/[0.05] hover:border-[#4F46E5]/40 transition-all duration-300 rounded-[2rem] p-5 flex flex-col justify-between cursor-pointer space-y-4 hover:shadow-[0_15px_35px_rgba(79,70,229,0.05)] backdrop-blur-md"
+                  className="group bg-[#070611]/45 border border-white/[0.05] hover:border-white/20 transition-all duration-300 rounded-[2rem] p-5 flex flex-col justify-between cursor-pointer space-y-4 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-md"
+                  whileHover={{
+                    y: -4,
+                    borderColor: activeAccent.accentHex,
+                    boxShadow: `0 15px 30px -10px ${activeAccent.accentHex}12`
+                  }}
                 >
                   <div className="space-y-3.5">
-                    <div className="aspect-[16/10] overflow-hidden rounded-[1.4rem] border border-white/[0.05] relative bg-black">
+                    <div className="aspect-[16/10] overflow-hidden rounded-[1.4rem] border border-white/[0.04] relative bg-black">
                       <img
                         src={post.image}
                         alt={post.title}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75 group-hover:brightness-90 animate-fade-in"
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 brightness-75 group-hover:brightness-90 animate-fade-in"
                       />
-                      <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-black/85 backdrop-blur-md border border-white/10 text-[8px] font-mono uppercase tracking-widest rounded-lg text-white/90">
+                      <span className="absolute bottom-2.5 left-2.5 px-2.5 py-1 bg-black/85 backdrop-blur-md border border-white/5 text-[8px] font-mono uppercase tracking-widest rounded-lg text-white/90">
                         {post.category}
                       </span>
                     </div>
 
                     <div className="space-y-1.5 px-0.5">
-                      <span className="text-[9px] text-[#EC4899] font-mono tracking-wider uppercase font-bold">{post.date}</span>
-                      <h4 className="font-serif text-sm text-white font-extrabold line-clamp-2 uppercase group-hover:text-[#EC4899] transition-colors leading-snug">
+                      <span className="text-[9px] font-mono tracking-wider uppercase font-bold" style={{ color: activeAccent.accentHex }}>{post.date}</span>
+                      <h4 className="font-serif text-sm text-white font-extrabold line-clamp-2 uppercase group-hover:text-white transition-colors leading-snug">
                         {post.title}
                       </h4>
-                      <p className="text-white/50 text-[11px] leading-relaxed line-clamp-3 font-light font-sans mt-1">
+                      <p className="text-white/40 text-[11px] leading-relaxed line-clamp-3 font-light font-sans mt-1">
                         {post.summary}
                       </p>
                     </div>
@@ -736,11 +984,11 @@ export default function ForgePortal({
 
                   <div className="pt-3 border-t border-white/[0.05] flex items-center justify-between text-[9px] font-mono text-white/45 group-hover:text-white/70 transition-colors px-0.5">
                     <span>{post.readTime}</span>
-                    <span className="text-indigo-400 font-bold flex items-center gap-1 group-hover:underline">
+                    <span className="font-bold flex items-center gap-1 group-hover:underline" style={{ color: activeAccent.accentHex }}>
                       READ LOG <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </div>
-                </article>
+                </motion.article>
               ))}
             </div>
           </section>
@@ -754,54 +1002,58 @@ export default function ForgePortal({
       </div>
 
       {/* FOOTER */}
-      <footer className="shrink-0 bg-[#070611]/60 backdrop-blur-xl border-t border-white/[0.06] mt-16 p-6 md:p-8 relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-wrap gap-12">
+      <footer className="shrink-0 bg-zinc-950/90 backdrop-blur-xl border-t border-white/[0.05] mt-16 p-8 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-wrap gap-12 text-center md:text-left">
             <div className="flex flex-col gap-1.5">
-              <span className="text-[9px] uppercase tracking-[0.2em] opacity-35 font-bold font-sans">Status</span>
-              <span className="text-xs font-mono text-[#10B981] tracking-tighter uppercase font-bold">FORGE_ACTIVE // 98% LOAD</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 font-bold font-mono">Status</span>
+              <span className="text-xs font-mono tracking-tighter uppercase font-bold flex items-center gap-1.5 justify-center md:justify-start" style={{ color: activeAccent.accentHex }}>
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: activeAccent.accentHex, boxShadow: `0 0 8px ${activeAccent.accentHex}` }} />
+                FORGE_ACTIVE // ONLINE
+              </span>
             </div>
             
             <div className="flex flex-col gap-1.5">
-              <span className="text-[9px] uppercase tracking-[0.2em] opacity-35 font-bold font-sans">Completed</span>
-              <span className="text-xs font-mono text-white/90 tracking-tighter font-semibold">42_DEPLOYED_MODULES</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 font-bold font-mono">Completed Projects</span>
+              <span className="text-xs font-mono text-white/90 tracking-tighter font-semibold">42_LEGEND_MODULES</span>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <span className="text-[9px] uppercase tracking-[0.2em] opacity-35 font-bold font-sans">Location</span>
-              <span className="text-xs font-mono text-white/70 tracking-tighter">LAT_40.7128_N_74.0060_W</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 font-bold font-mono">Operations</span>
+              <span className="text-xs font-mono text-white/60 tracking-tighter">LAT_40.7128_N_74.0060_W</span>
             </div>
 
             {/* Legal Trust compliance pathways (Cookie Notice, Terms, Support Hub) */}
             <div className="flex flex-col gap-1.5">
-              <span className="text-[9px] uppercase tracking-[0.2em] opacity-35 font-bold font-sans">Trust & Compliance</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 font-bold font-mono">Trust & Compliance</span>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-mono">
                 <button 
                   onClick={() => setActiveLegalTab("privacy")} 
-                  className="hover:text-[#EC4899] text-white/60 transition-colors cursor-pointer text-left text-xs"
+                  className="hover:text-white text-white/50 transition-colors cursor-pointer text-left text-xs"
                 >
                   Privacy Policy
                 </button>
                 <span className="text-white/10 select-none hidden sm:inline">•</span>
                 <button 
                   onClick={() => setActiveLegalTab("terms")} 
-                  className="hover:text-[#EC4899] text-white/60 transition-colors cursor-pointer text-left text-xs"
+                  className="hover:text-white text-white/50 transition-colors cursor-pointer text-left text-xs"
                 >
                   Terms of Service
                 </button>
                 <span className="text-white/10 select-none hidden sm:inline">•</span>
                 <button 
                   onClick={() => setActiveLegalTab("contact")} 
-                  className="hover:text-[#EC4899] text-[#EC4899]/90 font-bold transition-colors cursor-pointer text-left text-xs"
+                  className="font-bold transition-colors cursor-pointer text-left text-xs"
+                  style={{ color: activeAccent.accentHex }}
                 >
-                  Support & Contacts
+                  Support Nexus
                 </button>
               </div>
             </div>
 
             {/* Social Media applications hub */}
             <div className="flex flex-col gap-1.5 min-w-[150px]">
-              <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 font-bold font-sans text-white">Social Nexus</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] opacity-45 font-bold font-mono text-white/60">Social Nexus</span>
               <div className="flex items-center gap-2.5">
                 {studioSettings.facebookUrl && (
                   <a 
@@ -907,6 +1159,7 @@ export default function ForgePortal({
           <ProjectModal
             project={selectedProject}
             onClose={() => setSelectedProject(null)}
+            accentHex={activeAccent.accentHex}
           />
         )}
       </AnimatePresence>
@@ -1050,13 +1303,65 @@ export default function ForgePortal({
                     <span className="text-[9px] text-slate-400 font-mono tracking-wider">FORGE COMMANDER</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => setIsChatOpen(false)}
-                  className="w-7 h-7 flex items-center justify-center bg-white/5 hover:bg-white/10 hover:text-white rounded-lg border border-white/10 text-slate-400 transition-colors cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setShowKeyInput(!showKeyInput)}
+                    title="Direct Gemini Connection Settings"
+                    type="button"
+                    className={`w-7 h-7 flex items-center justify-center rounded-lg border transition-all duration-300 cursor-pointer ${
+                      userGeminiKey.trim() 
+                        ? "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.15)]" 
+                        : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <Key className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setIsChatOpen(false)}
+                    className="w-7 h-7 flex items-center justify-center bg-white/5 hover:bg-white/10 hover:text-white rounded-lg border border-white/10 text-slate-400 transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
+
+              {/* Collapsible Key-Panel */}
+              {showKeyInput && (
+                <div className="p-3.5 bg-[#0C0C1D] border-b border-indigo-500/20 text-slate-300 flex flex-col gap-2 font-mono text-[10px]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#FFD1B3] font-bold tracking-wider text-[9px] uppercase">Browser-Direct API Routing</span>
+                    <span className="text-[8px] text-emerald-400 uppercase font-black px-1.5 py-0.5 rounded bg-emerald-950/50 border border-emerald-500/20">Secure Local Client</span>
+                  </div>
+                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
+                    Enter your Gemini API key to establish a direct connection to the internet without relying on any external backend server. Stored locally on this browser.
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="password"
+                      value={userGeminiKey}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setUserGeminiKey(val);
+                        safeStorage.setItem("mythics_user_gemini_key", val);
+                      }}
+                      placeholder="Paste your Gemini API Key here (AIzaSy...)"
+                      className="flex-1 bg-black/60 border border-indigo-500/25 rounded-lg px-2.5 py-1.5 text-xs text-amber-400 outline-none focus:border-amber-500/40"
+                    />
+                    {userGeminiKey && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserGeminiKey("");
+                          safeStorage.removeItem("mythics_user_gemini_key");
+                        }}
+                        className="px-2 py-1.5 bg-red-950/40 text-red-400 border border-red-500/25 rounded-lg hover:bg-red-950/60 font-sans font-medium text-[9px] uppercase cursor-pointer transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Chat Message Box */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs scrollbar-thin scrollbar-thumb-white/5">
@@ -1077,12 +1382,25 @@ export default function ForgePortal({
                         ? "bg-indigo-650/40 text-slate-250 border border-indigo-500/15"
                         : "bg-slate-900/60 text-slate-350 border border-white/5"
                     }`}>
-                      {/* Standard text split with light dynamic custom paragraph rendering */}
-                      {msg.content.split("\n").map((line, lIdx) => (
-                        <p key={lIdx} className={line.trim() === "" ? "h-2" : "mb-1 text-slate-250"}>
-                          {line}
-                        </p>
-                      ))}
+                      <div className="markdown-body">
+                        <Markdown
+                          components={{
+                            strong: ({ children }) => <strong className="font-extrabold text-[#FFD1B3]">{children}</strong>,
+                            p: ({ children }) => <p className="mb-2 text-slate-200 leading-relaxed font-sans last:mb-0">{children}</p>,
+                            a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#F9AB00] hover:underline hover:text-amber-400 font-medium">{children}</a>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 space-y-1 my-2 text-slate-300 font-sans">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-4 space-y-1 my-2 text-slate-300 font-sans">{children}</ol>,
+                            li: ({ children }) => <li className="text-slate-300 mb-0.5">{children}</li>,
+                            code: ({ children }) => <code className="bg-black/50 border border-white/10 rounded-md px-1 py-0.5 font-mono text-[10px] text-[#F9AB00]">{children}</code>,
+                            pre: ({ children }) => <pre className="bg-slate-950 border border-white/10 rounded-xl p-2.5 my-2 font-mono text-[10px] text-slate-300 overflow-x-auto whitespace-pre-wrap break-all">{children}</pre>,
+                            h1: ({ children }) => <h3 className="text-sm font-semibold tracking-tight text-white mb-2 pt-1 font-sans">{children}</h3>,
+                            h2: ({ children }) => <h3 className="text-xs font-semibold tracking-tight text-[#FFD1B3] mb-1.5 pt-1 uppercase font-mono">{children}</h3>,
+                            h3: ({ children }) => <h4 className="text-xs font-semibold tracking-tight text-[#FFD1B3]/90 mb-1 pt-1 font-mono">{children}</h4>,
+                          }}
+                        >
+                          {msg.content}
+                        </Markdown>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1106,6 +1424,27 @@ export default function ForgePortal({
                     ⚠️ {chatError}
                   </div>
                 )}
+              </div>
+
+              {/* Interactive "Forge Sparks" chat starter row */}
+              <div className={`px-3 py-1.5 border-t border-indigo-500/10 bg-[#070612]/90 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none scrollbar-thin`}>
+                {[
+                  { label: "🛡️ Scan Security Status", prompt: "Perform a system-level security check on the current chat agent and explain browser connection safety." },
+                  { label: "🔑 Set Up API Key", prompt: "Explain how to safely obtain a free Gemini API Key and link it to this website." },
+                  { label: "🛠️ Install Theme Guide", prompt: "Show me a step-by-step guide to download and install the compiled Mythics Forge XML theme inside Blogger." },
+                  { label: "💵 Embed AdSense Code", prompt: "Show me how to insert Google AdSense ad units into my custom HTML sections." }
+                ].map((spark, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    disabled={isChatLoading}
+                    onClick={() => handleSendMessage(undefined, spark.prompt)}
+                    className={`inline-flex shrink-0 items-center justify-center px-2.5 py-1 text-[9px] font-mono leading-none rounded-lg border text-slate-300 hover:text-white bg-[#0A0918]/60 transition-all cursor-pointer ${activeAccent.borderClass} hover:border-[#F9AB00]/40 disabled:opacity-50 disabled:cursor-not-allowed`}
+                    style={{ borderColor: activeAccent.accentHex + '4D' }}
+                  >
+                    {spark.label}
+                  </button>
+                ))}
               </div>
 
               {/* Input Action Form */}

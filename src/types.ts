@@ -65,4 +65,5 @@ export interface StudioSettings {
   adsenseSlotId?: string;
   adsenseEnabled?: boolean;
   adsensePlacement?: "header" | "footer" | "sidebar" | "none";
+  accentPreset?: "orange" | "blue" | "green" | "purple" | "red";
 }
