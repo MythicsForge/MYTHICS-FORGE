@@ -8,51 +8,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <div id="error-diagnostics-console" style="display:none; position:fixed; top:12px; left:12px; right:12px; max-height:85vh; overflow-y:auto; background-color:#1e1b4b; border:2px solid #ef4444; border-radius:12px; padding:16px; font-family:monospace; font-size:13px; color:#fca5a5; z-index:999999; box-shadow:0 10px 30px rgba(0,0,0,0.85); line-height:1.5;">
-      <h3 style="margin-top:0; color:#f87171; font-size:16px; font-weight:bold; border-bottom:1px solid rgba(239, 68, 68, 0.4); padding-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-        <span>⚠️ SYSTEM FAILURE DETECTED</span>
-        <button onclick="document.getElementById('error-diagnostics-console').style.display='none'" style="background:rgba(239, 68, 68, 0.2); border:1px solid #ef4444; color:#fca5a5; border-radius:4px; padding:2px 8px; cursor:pointer;">Dismiss</button>
-      </h3>
-      <div id="error-diagnostics-message" style="white-space:pre-wrap; margin-bottom:12px;"></div>
-      <div style="font-size:11px; color:#93c5fd; border-top:1px solid rgba(147, 197, 253, 0.2); padding-top:8px;">
-        Please capture this log trace and relay it to the engineering core.
-      </div>
-    </div>
-    <script>
-      (function(){
-        function showError(msg, stack) {
-          try {
-            var valEl = document.getElementById('error-diagnostics-message');
-            var conEl = document.getElementById('error-diagnostics-console');
-            if (valEl && conEl) {
-              conEl.style.display = 'block';
-              valEl.textContent = (valEl.textContent ? valEl.textContent + '\n\n' : '') + msg + (stack ? '\nSTACX TRACE:\n' + stack : '');
-            } else {
-              console.error("DIAGNOSTIC ERROR CAUGHT: ", msg, stack);
-            }
-          } catch(e) {
-            console.error(e);
-          }
-        }
-        window.addEventListener('error', function(event) {
-          var errorInfo = event.error;
-          var msg = event.message || (errorInfo && errorInfo.message) || 'Unspecified window.onerror triggered';
-          var stack = errorInfo && errorInfo.stack;
-          
-          // Enhanced debug metadata to locate exact syntax error location
-          var locStr = '\nURL: ' + (event.filename || 'Inline/Dynamic') + 
-                       '\nPosition: Line ' + (event.lineno || '?') + ', Column ' + (event.colno || '?');
-          
-          showError(msg + locStr, stack);
-        });
-        window.addEventListener('unhandledrejection', function(event) {
-          var reason = event.reason;
-          var msg = 'Unhandled Promise Rejection: ' + (reason && (reason.stack || reason.message || reason));
-          showError(msg, null);
-        });
-        console.log("🛠️ Diagnostic telemetry hooks primed successfully.");
-      })();
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
