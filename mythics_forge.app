@@ -55,6 +55,6 @@
     "monetagZoneId": "",
     "monetagFormat": "MultiTag",
     "monetagCustomCode": "",
-    "accentPreset": "orange"
+    "accentPreset": "purple"
   }
 }
